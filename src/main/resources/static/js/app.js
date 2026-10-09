@@ -157,10 +157,11 @@ function renderDepartmentChart(deptData) {
             datasets: [{
                 data: counts,
                 backgroundColor: [
-                    '#2563eb', '#38bdf8', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b'
+                    '#0071e3', '#34c759', '#ff9500', '#5856d6', '#af52de', '#30b0c7', '#8e8e93'
                 ],
-                borderWidth: 2,
-                borderColor: '#ffffff'
+                borderWidth: 3,
+                borderColor: '#ffffff',
+                hoverOffset: 6
             }]
         },
         options: {
@@ -169,10 +170,18 @@ function renderDepartmentChart(deptData) {
             plugins: {
                 legend: {
                     position: 'bottom',
-                    labels: { boxWidth: 12, font: { size: 11 } }
+                    labels: { 
+                        boxWidth: 10, 
+                        boxHeight: 10,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        font: { family: '-apple-system, SF Pro Text, Inter, sans-serif', size: 11, weight: '500' },
+                        color: '#48484a',
+                        padding: 16
+                    }
                 }
             },
-            cutout: '65%'
+            cutout: '72%'
         }
     });
 }
@@ -188,12 +197,12 @@ function renderCompanyStatsTable(companies) {
 
     tbody.innerHTML = companies.map(c => `
         <tr>
-            <td class="fw-semibold text-primary">${escapeHtml(c.name)}</td>
-            <td><span class="badge bg-light text-dark border">${escapeHtml(c.jobRole)}</span></td>
-            <td><strong>${c.minCgpa}</strong> CGPA</td>
+            <td class="fw-semibold" style="color: var(--apple-label);">${escapeHtml(c.name)}</td>
+            <td><span class="badge-skill">${escapeHtml(c.jobRole)}</span></td>
+            <td><strong style="color: var(--apple-blue); font-variant-numeric: tabular-nums;">${c.minCgpa.toFixed(1)}</strong> CGPA</td>
             <td>
-                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
-                    <i class="bi bi-people-fill me-1"></i> ${c.eligibleCount} Candidates Eligible
+                <span class="badge-eligible">
+                    ${c.eligibleCount} Candidates Eligible
                 </span>
             </td>
         </tr>
@@ -213,15 +222,15 @@ function renderRecentShortlistsTable(shortlists) {
         const dateStr = s.generatedAt ? s.generatedAt.replace('T', ' ').substring(0, 16) : '-';
         return `
             <tr>
-                <td class="text-muted small">${dateStr}</td>
-                <td class="fw-bold">${escapeHtml(s.companyName)}</td>
-                <td><span class="badge bg-light text-dark border">${escapeHtml(s.jobRole)}</span></td>
+                <td class="text-muted small" style="font-variant-numeric: tabular-nums;">${dateStr}</td>
+                <td class="fw-semibold">${escapeHtml(s.companyName)}</td>
+                <td><span class="badge-skill">${escapeHtml(s.jobRole)}</span></td>
                 <td>${s.totalEvaluated}</td>
-                <td><span class="badge bg-success">${s.eligibleCount}</span></td>
-                <td><span class="badge bg-danger">${s.ineligibleCount}</span></td>
+                <td><span class="badge-eligible">${s.eligibleCount}</span></td>
+                <td><span class="badge-ineligible">${s.ineligibleCount}</span></td>
                 <td>
-                    <button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="viewHistoryDetails(${s.id})">
-                        <i class="bi bi-eye"></i> View
+                    <button class="btn btn-sm btn-light border py-1 px-3" onclick="viewHistoryDetails(${s.id})">
+                        <i class="bi bi-eye text-primary"></i> View
                     </button>
                 </td>
             </tr>
@@ -270,28 +279,28 @@ function renderStudentsTable(students) {
     tbody.innerHTML = students.map(s => {
         const skillsBadges = (s.skills || []).map(sk => `<span class="badge-skill">${escapeHtml(sk.name)}</span>`).join('') || '<span class="text-muted small">None</span>';
         const backlogBadge = s.activeBacklogs > 0
-            ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle">${s.activeBacklogs} Backlogs</span>`
-            : `<span class="badge bg-success-subtle text-success border border-success-subtle">Clear (0)</span>`;
+            ? `<span class="badge-ineligible">${s.activeBacklogs} Backlogs</span>`
+            : `<span class="badge-eligible">Clear (0)</span>`;
 
         return `
             <tr>
-                <td><code>${escapeHtml(s.studentId)}</code></td>
+                <td><span style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.8rem; background: rgba(0,0,0,0.04); padding: 3px 6px; border-radius: 6px; color: #3a3a3c;">${escapeHtml(s.studentId)}</span></td>
                 <td>
-                    <div class="fw-bold">${escapeHtml(s.fullName)}</div>
+                    <div class="fw-semibold" style="color: var(--apple-label);">${escapeHtml(s.fullName)}</div>
                     <div class="text-muted small" style="font-size: 0.75rem;">${escapeHtml(s.email)}</div>
                 </td>
-                <td><span class="badge bg-light text-dark border">${escapeHtml(s.department)}</span></td>
-                <td><strong class="text-primary">${s.cgpa.toFixed(2)}</strong></td>
+                <td><span class="badge-skill fw-semibold">${escapeHtml(s.department)}</span></td>
+                <td><strong style="color: var(--apple-blue); font-variant-numeric: tabular-nums;">${s.cgpa.toFixed(2)}</strong></td>
                 <td>${backlogBadge}</td>
                 <td style="max-width: 250px;">${skillsBadges}</td>
-                <td>${s.graduationYear}</td>
+                <td style="font-variant-numeric: tabular-nums;">${s.graduationYear}</td>
                 <td class="text-end">
-                    <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-secondary" onclick="editStudent(${s.id})" title="Edit">
-                            <i class="bi bi-pencil-square"></i>
+                    <div class="d-inline-flex gap-1">
+                        <button class="btn btn-sm btn-light border py-1 px-2" onclick="editStudent(${s.id})" title="Edit">
+                            <i class="bi bi-pencil" style="font-size: 0.85rem;"></i>
                         </button>
-                        <button class="btn btn-outline-danger" onclick="promptDelete('student', ${s.id}, '${escapeHtml(s.fullName)}')" title="Delete">
-                            <i class="bi bi-trash"></i>
+                        <button class="btn btn-sm btn-light border text-danger py-1 px-2" onclick="promptDelete('student', ${s.id}, '${escapeHtml(s.fullName)}')" title="Delete">
+                            <i class="bi bi-trash" style="font-size: 0.85rem;"></i>
                         </button>
                     </div>
                 </td>
@@ -478,8 +487,8 @@ async function renderCompaniesTable(companies) {
 
         const skillsBadges = (c.requiredSkills || []).map(sk => `<span class="badge-skill">${escapeHtml(sk.name)}</span>`).join('') || '<span class="text-muted small">None</span>';
         const modeBadge = c.skillMatchingMode === 'ALL'
-            ? `<span class="badge bg-primary">ALL</span>`
-            : `<span class="badge bg-info text-dark">ANY</span>`;
+            ? `<span style="background: rgba(0, 113, 227, 0.1); color: #0071e3; font-weight: 600; padding: 3px 8px; border-radius: 6px; font-size: 0.72rem;">ALL</span>`
+            : `<span style="background: rgba(88, 86, 214, 0.1); color: #5856d6; font-weight: 600; padding: 3px 8px; border-radius: 6px; font-size: 0.72rem;">ANY</span>`;
 
         const activeSwitch = `
             <div class="form-check form-switch d-inline-block">
@@ -489,28 +498,28 @@ async function renderCompaniesTable(companies) {
 
         return `
             <tr>
-                <td><code>${escapeHtml(c.companyCode || '-')}</code></td>
-                <td class="fw-bold">${escapeHtml(c.name)}</td>
-                <td><span class="badge bg-light text-dark border">${escapeHtml(c.jobRole)}</span></td>
-                <td><strong>${c.minCgpa}</strong></td>
+                <td><span style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.8rem; background: rgba(0,0,0,0.04); padding: 3px 6px; border-radius: 6px; color: #3a3a3c;">${escapeHtml(c.companyCode || '-')}</span></td>
+                <td class="fw-semibold" style="color: var(--apple-label);">${escapeHtml(c.name)}</td>
+                <td><span class="badge-skill">${escapeHtml(c.jobRole)}</span></td>
+                <td><strong style="color: var(--apple-blue); font-variant-numeric: tabular-nums;">${c.minCgpa.toFixed(1)}</strong></td>
                 <td>${c.maxBacklogs}</td>
                 <td>${modeBadge}</td>
                 <td style="max-width: 200px;">${skillsBadges}</td>
-                <td>${escapeHtml(c.eligibleDepartments || 'All')}</td>
-                <td>${c.eligibleGraduationYear || 'Any'}</td>
+                <td><span class="text-muted small">${escapeHtml(c.eligibleDepartments || 'All')}</span></td>
+                <td style="font-variant-numeric: tabular-nums;">${c.eligibleGraduationYear || 'Any'}</td>
                 <td>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                    <span class="badge-eligible">
                         ${eligibleCount} Eligible
                     </span>
                 </td>
                 <td>${activeSwitch}</td>
                 <td class="text-end">
-                    <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-secondary" onclick="editCompany(${c.id})" title="Edit">
-                            <i class="bi bi-pencil-square"></i>
+                    <div class="d-inline-flex gap-1">
+                        <button class="btn btn-sm btn-light border py-1 px-2" onclick="editCompany(${c.id})" title="Edit">
+                            <i class="bi bi-pencil" style="font-size: 0.85rem;"></i>
                         </button>
-                        <button class="btn btn-outline-danger" onclick="promptDelete('company', ${c.id}, '${escapeHtml(c.name)}')" title="Delete">
-                            <i class="bi bi-trash"></i>
+                        <button class="btn btn-sm btn-light border text-danger py-1 px-2" onclick="promptDelete('company', ${c.id}, '${escapeHtml(c.name)}')" title="Delete">
+                            <i class="bi bi-trash" style="font-size: 0.85rem;"></i>
                         </button>
                     </div>
                 </td>
@@ -689,10 +698,12 @@ function validateWeights() {
 
     badge.textContent = `Total: ${total.toFixed(0)}%`;
     if (Math.abs(total - 100) < 0.001) {
-        badge.style.backgroundColor = '#10b981';
+        badge.style.backgroundColor = 'var(--apple-green)';
+        badge.style.color = '#ffffff';
         return true;
     } else {
-        badge.style.backgroundColor = '#ef4444';
+        badge.style.backgroundColor = 'var(--apple-red)';
+        badge.style.color = '#ffffff';
         return false;
     }
 }
@@ -829,21 +840,21 @@ function renderEligibleTable(candidates) {
         return `
             <tr>
                 <td><span class="badge-rank ${rankBadgeClass}">#${c.rankNumber}</span></td>
-                <td><code>${escapeHtml(c.studentId)}</code></td>
-                <td class="fw-bold">${escapeHtml(c.studentName)}</td>
-                <td><span class="badge bg-light text-dark border">${escapeHtml(c.department)}</span></td>
-                <td><strong class="text-primary">${c.cgpa.toFixed(2)}</strong></td>
-                <td>${c.activeBacklogs}</td>
-                <td><span class="badge bg-info-subtle text-info-emphasis border">${escapeHtml(c.matchedSkillsSummary || 'None')}</span></td>
+                <td><span style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.8rem; background: rgba(0,0,0,0.04); padding: 3px 6px; border-radius: 6px; color: #3a3a3c;">${escapeHtml(c.studentId)}</span></td>
+                <td class="fw-semibold" style="color: var(--apple-label);">${escapeHtml(c.studentName)}</td>
+                <td><span class="badge-skill fw-semibold">${escapeHtml(c.department)}</span></td>
+                <td><strong style="color: var(--apple-blue); font-variant-numeric: tabular-nums;">${c.cgpa.toFixed(2)}</strong></td>
+                <td><span class="badge-eligible">${c.activeBacklogs} Backlogs</span></td>
+                <td><span class="badge-skill">${escapeHtml(c.matchedSkillsSummary || 'None')}</span></td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
-                        <strong class="text-success fs-6">${c.rankingScore.toFixed(2)}</strong>
-                        <div class="progress flex-grow-1" style="height: 6px; width: 60px;">
-                            <div class="progress-bar bg-success" style="width: ${c.rankingScore}%"></div>
+                        <strong style="color: var(--apple-green-text); font-variant-numeric: tabular-nums; font-size: 0.95rem;">${c.rankingScore.toFixed(2)}</strong>
+                        <div class="progress flex-grow-1" style="height: 6px; width: 64px; background: rgba(0,0,0,0.06); border-radius: 9999px;">
+                            <div class="progress-bar" style="width: ${c.rankingScore}%; background-color: var(--apple-green); border-radius: 9999px;"></div>
                         </div>
                     </div>
                 </td>
-                <td><span class="badge-eligible"><i class="bi bi-check-circle-fill"></i> Eligible</span></td>
+                <td><span class="badge-eligible">Eligible</span></td>
             </tr>
         `;
     }).join('');
@@ -858,7 +869,7 @@ function renderIneligibleTable(candidates) {
             <tr>
                 <td colspan="8">
                     <div class="empty-state py-4">
-                        <i class="bi bi-check-circle-fill text-success fs-2"></i>
+                        <i class="bi bi-check-circle text-success fs-2"></i>
                         <h6>No Ineligible Candidates</h6>
                         <p class="small">All evaluated students met the eligibility criteria!</p>
                     </div>
@@ -871,18 +882,18 @@ function renderIneligibleTable(candidates) {
     tbody.innerHTML = candidates.map(c => {
         return `
             <tr>
-                <td><code>${escapeHtml(c.studentId)}</code></td>
-                <td class="fw-bold">${escapeHtml(c.studentName)}</td>
-                <td><span class="badge bg-light text-dark border">${escapeHtml(c.department)}</span></td>
-                <td>${c.cgpa.toFixed(2)}</td>
-                <td>${c.activeBacklogs}</td>
+                <td><span style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.8rem; background: rgba(0,0,0,0.04); padding: 3px 6px; border-radius: 6px; color: #3a3a3c;">${escapeHtml(c.studentId)}</span></td>
+                <td class="fw-semibold" style="color: var(--apple-label);">${escapeHtml(c.studentName)}</td>
+                <td><span class="badge-skill fw-semibold">${escapeHtml(c.department)}</span></td>
+                <td><span style="font-variant-numeric: tabular-nums;">${c.cgpa.toFixed(2)}</span></td>
+                <td><span class="badge-ineligible">${c.activeBacklogs} Backlogs</span></td>
                 <td style="max-width: 180px;"><span class="text-muted small">${escapeHtml(c.skillsSummary || 'None')}</span></td>
                 <td>
-                    <span class="text-danger small fw-semibold">
-                        <i class="bi bi-x-octagon-fill me-1"></i> ${escapeHtml(c.rejectionReasons || 'Criteria not met')}
+                    <span class="text-danger small fw-medium" style="font-size: 0.82rem;">
+                        <i class="bi bi-x-circle me-1"></i> ${escapeHtml(c.rejectionReasons || 'Criteria not met')}
                     </span>
                 </td>
-                <td><span class="badge-ineligible"><i class="bi bi-x-circle-fill"></i> Ineligible</span></td>
+                <td><span class="badge-ineligible">Ineligible</span></td>
             </tr>
         `;
     }).join('');
