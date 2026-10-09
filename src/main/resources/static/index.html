@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Placement Portal - Candidate Tracking & Shortlisting</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link href="/css/styles.css" rel="stylesheet">
+    <!-- Chart.js for Visual Reports -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="app-wrapper">
+    <!-- Persistent Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">
+                <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <div class="brand-text">
+                <h5>Placement Hub</h5>
+                <small>Campus Placement Portal</small>
+            </div>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li class="menu-category">Main Navigation</li>
+            <li>
+                <a href="#dashboard" class="nav-link-item active" onclick="navigate('dashboard')">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#students" class="nav-link-item" onclick="navigate('students')">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Students</span>
+                </a>
+            </li>
+            <li>
+                <a href="#companies" class="nav-link-item" onclick="navigate('companies')">
+                    <i class="bi bi-building-fill"></i>
+                    <span>Companies</span>
+                </a>
+            </li>
+            <li>
+                <a href="#shortlist" class="nav-link-item" onclick="navigate('shortlist')">
+                    <i class="bi bi-funnel-fill"></i>
+                    <span>Generate Shortlist</span>
+                </a>
+            </li>
+            <li>
+                <a href="#reports" class="nav-link-item" onclick="navigate('reports')">
+                    <i class="bi bi-journal-text"></i>
+                    <span>Shortlist History</span>
+                </a>
+            </li>
+            <li class="menu-category">Information</li>
+            <li>
+                <a href="#settings" class="nav-link-item" onclick="navigate('settings')">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <span>Ranking Rules & Info</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="d-flex align-items-center gap-2 text-white-50 small">
+                <i class="bi bi-award-fill text-warning"></i>
+                <span>College Placement Cell</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-sm btn-outline-secondary d-lg-none" onclick="toggleSidebar()">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="page-title">
+                    <h4 id="pageHeading">Dashboard</h4>
+                    <p id="pageSubheading">Placement overview, drive analytics, and candidate metrics</p>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill d-none d-sm-inline-flex align-items-center gap-2">
+                    <span class="spinner-grow spinner-grow-sm text-success" style="width: 8px; height: 8px;"></span>
+                    Active Session
+                </span>
+                <button class="btn btn-sm btn-light border" onclick="refreshCurrentView()">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Body Content -->
+        <main class="content-body">
+
+            <!-- ============================================================ -->
+            <!-- 1. DASHBOARD VIEW -->
+            <!-- ============================================================ -->
+            <section id="view-dashboard" class="app-view">
+                <!-- 4 Top KPI Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card-stat">
+                            <div class="stat-icon blue">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h3 id="statTotalStudents">0</h3>
+                                <span>Registered Students</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card-stat">
+                            <div class="stat-icon purple">
+                                <i class="bi bi-buildings-fill"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h3 id="statTotalCompanies">0</h3>
+                                <span>Visiting Companies</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card-stat">
+                            <div class="stat-icon green">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h3 id="statLatestEligible">0</h3>
+                                <span>Eligible (Latest Run)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card-stat">
+                            <div class="stat-icon amber">
+                                <i class="bi bi-file-earmark-spreadsheet-fill"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h3 id="statTotalShortlists">0</h3>
+                                <span>Shortlists Generated</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts & Company Stats Row -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="app-card h-100 mb-0">
+                            <div class="app-card-header">
+                                <h5><i class="bi bi-pie-chart-fill text-primary me-2"></i>Department-wise Student Distribution</h5>
+                            </div>
+                            <div class="app-card-body d-flex align-items-center justify-content-center" style="min-height: 280px;">
+                                <div style="max-height: 260px; width: 100%;">
+                                    <canvas id="deptChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="app-card h-100 mb-0">
+                            <div class="app-card-header">
+                                <h5><i class="bi bi-building-check text-primary me-2"></i>Company Candidate Readiness</h5>
+                            </div>
+                            <div class="app-card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-custom align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Company</th>
+                                                <th>Role</th>
+                                                <th>Min CGPA</th>
+                                                <th>Eligible Pool</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="companyStatsTableBody">
+                                            <tr><td colspan="4" class="text-center py-4 text-muted">Loading company statistics...</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Shortlist Runs -->
+                <div class="app-card">
+                    <div class="app-card-header">
+                        <h5><i class="bi bi-clock-history text-primary me-2"></i>Recent Shortlist Runs</h5>
+                        <button class="btn btn-sm btn-outline-primary" onclick="navigate('shortlist')">
+                            <i class="bi bi-plus-lg me-1"></i> New Shortlist
+                        </button>
+                    </div>
+                    <div class="app-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-custom align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date & Time</th>
+                                        <th>Company</th>
+                                        <th>Job Role</th>
+                                        <th>Total Evaluated</th>
+                                        <th>Eligible</th>
+                                        <th>Ineligible</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentShortlistsTableBody">
+                                    <tr><td colspan="7" class="text-center py-4 text-muted">No shortlists generated yet.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- 2. STUDENTS VIEW -->
+            <!-- ============================================================ -->
+            <section id="view-students" class="app-view d-none">
+                <div class="app-card">
+                    <div class="app-card-header flex-wrap gap-2">
+                        <h5><i class="bi bi-people-fill text-primary me-2"></i>Student Academic & Skills Directory</h5>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <button class="btn btn-sm btn-outline-success" onclick="openImportModal()">
+                                <i class="bi bi-file-earmark-arrow-up me-1"></i> Import CSV
+                            </button>
+                            <button class="btn btn-sm btn-primary" onclick="openAddStudentModal()">
+                                <i class="bi bi-person-plus-fill me-1"></i> Add Student
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-3 border-bottom bg-light">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-5">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                                    <input type="text" id="studentSearchInput" class="form-control" placeholder="Search by name or Student ID..." oninput="handleStudentSearch()">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="studentDeptFilter" class="form-select form-select-sm" onchange="handleStudentDeptFilter()">
+                                    <option value="ALL">All Departments</option>
+                                    <option value="CSE">CSE</option>
+                                    <option value="IT">IT</option>
+                                    <option value="ECE">ECE</option>
+                                    <option value="MECH">MECH</option>
+                                    <option value="CIVIL">CIVIL</option>
+                                    <option value="EEE">EEE</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 text-md-end text-muted small" id="studentsCountLabel">
+                                Showing 0 students
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="app-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-custom align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Full Name</th>
+                                        <th>Department</th>
+                                        <th>CGPA</th>
+                                        <th>Backlogs</th>
+                                        <th>Technical Skills</th>
+                                        <th>Grad Year</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentsTableBody">
+                                    <tr><td colspan="8" class="text-center py-4 text-muted">Loading students...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- 3. COMPANIES VIEW -->
+            <!-- ============================================================ -->
+            <section id="view-companies" class="app-view d-none">
+                <div class="app-card">
+                    <div class="app-card-header flex-wrap gap-2">
+                        <h5><i class="bi bi-building-fill text-primary me-2"></i>Visiting Companies & Eligibility Rules</h5>
+                        <button class="btn btn-sm btn-primary" onclick="openAddCompanyModal()">
+                            <i class="bi bi-plus-circle-fill me-1"></i> Register Company
+                        </button>
+                    </div>
+
+                    <div class="app-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-custom align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Company Name</th>
+                                        <th>Job Role</th>
+                                        <th>Min CGPA</th>
+                                        <th>Max Backlogs</th>
+                                        <th>Skill Mode</th>
+                                        <th>Required Skills</th>
+                                        <th>Eligible Depts</th>
+                                        <th>Batch</th>
+                                        <th>Eligible Pool</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="companiesTableBody">
+                                    <tr><td colspan="12" class="text-center py-4 text-muted">Loading companies...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- 4. GENERATE SHORTLIST VIEW -->
+            <!-- ============================================================ -->
+            <section id="view-shortlist" class="app-view d-none">
+                <!-- Company Selection and Criteria Card -->
+                <div class="app-card mb-4">
+                    <div class="app-card-header">
+                        <h5><i class="bi bi-funnel-fill text-primary me-2"></i>Select Company & Configure Ranking Weights</h5>
+                    </div>
+                    <div class="app-card-body">
+                        <div class="row g-4 align-items-center">
+                            <div class="col-lg-5">
+                                <label for="shortlistCompanySelect" class="form-label fw-semibold small text-muted">Select Visiting Company</label>
+                                <select id="shortlistCompanySelect" class="form-select form-select-lg" onchange="onShortlistCompanySelected()">
+                                    <option value="">-- Choose a company --</option>
+                                </select>
+                                <div class="form-text">Choose a company to view its criteria and evaluate candidates.</div>
+                            </div>
+
+                            <div class="col-lg-7">
+                                <div class="criteria-card" id="criteriaPreviewBox">
+                                    <div class="text-muted small mb-2"><i class="bi bi-shield-check text-primary me-1"></i>Configured Eligibility Rules:</div>
+                                    <div id="criteriaPills" class="d-flex flex-wrap gap-2">
+                                        <span class="text-muted small fst-italic">Select a company from the dropdown to load rules.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Configurable Ranking Weights -->
+                        <div class="border-top pt-3 mt-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-bold small text-uppercase text-muted"><i class="bi bi-sliders me-1"></i>Candidate Ranking Weights</span>
+                                <span class="badge" id="weightTotalBadge" style="background-color: #2563eb;">Total: 100%</span>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-semibold">CGPA Weight (%)</label>
+                                    <input type="number" id="weightCgpa" class="form-control" value="60" min="0" max="100" step="5" oninput="validateWeights()">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-semibold">Technical Skills Weight (%)</label>
+                                    <input type="number" id="weightSkills" class="form-control" value="30" min="0" max="100" step="5" oninput="validateWeights()">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-semibold">Certifications/Achievements (%)</label>
+                                    <input type="number" id="weightCerts" class="form-control" value="10" min="0" max="100" step="5" oninput="validateWeights()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-end mt-4">
+                            <button id="btnRunShortlist" class="btn btn-primary px-4 py-2 fw-semibold" onclick="generateShortlist()" disabled>
+                                <i class="bi bi-lightning-charge-fill me-1"></i> Run Shortlisting & Ranking Engine
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shortlist Evaluation Results Container -->
+                <div id="shortlistResultsContainer" class="d-none">
+                    <!-- Results KPI Banner -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="card-stat">
+                                <div class="stat-icon blue"><i class="bi bi-people"></i></div>
+                                <div class="stat-details">
+                                    <h3 id="resTotalEvaluated">0</h3>
+                                    <span>Students Evaluated</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card-stat">
+                                <div class="stat-icon green"><i class="bi bi-check2-circle"></i></div>
+                                <div class="stat-details">
+                                    <h3 id="resEligibleCount">0</h3>
+                                    <span>Eligible & Ranked</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card-stat">
+                                <div class="stat-icon amber"><i class="bi bi-x-circle"></i></div>
+                                <div class="stat-details">
+                                    <h3 id="resIneligibleCount">0</h3>
+                                    <span>Not Eligible</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ranked Results App Card -->
+                    <div class="app-card">
+                        <div class="app-card-header flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <ul class="nav nav-pills" id="candidateTabs">
+                                    <li class="nav-item">
+                                        <button class="nav-link active py-1 px-3 small fw-semibold" id="tab-eligible-btn" onclick="switchCandidateTab('eligible')">
+                                            <i class="bi bi-award-fill me-1"></i> Eligible Candidates (<span id="eligibleTabBadge">0</span>)
+                                        </button>
+                                    </li>
+                                    <li class="nav-item">
+                                        <button class="nav-link py-1 px-3 small fw-semibold" id="tab-ineligible-btn" onclick="switchCandidateTab('ineligible')">
+                                            <i class="bi bi-exclamation-octagon-fill me-1"></i> Ineligible Candidates (<span id="ineligibleTabBadge">0</span>)
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-outline-success" id="btnExportCsv" onclick="exportShortlist('csv')">
+                                    <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export CSV
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" id="btnExportJson" onclick="exportShortlist('json')">
+                                    <i class="bi bi-file-earmark-code me-1"></i> Export JSON
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Search and Filter in Shortlist -->
+                        <div class="p-3 border-bottom bg-light">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-md-6">
+                                    <input type="text" id="shortlistFilterInput" class="form-control form-control-sm" placeholder="Filter candidates by name or ID..." oninput="filterShortlistCandidates()">
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="shortlistDeptFilter" class="form-select form-select-sm" onchange="filterShortlistCandidates()">
+                                        <option value="ALL">All Departments</option>
+                                        <option value="CSE">CSE</option>
+                                        <option value="IT">IT</option>
+                                        <option value="ECE">ECE</option>
+                                        <option value="MECH">MECH</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Eligible Candidates Table Tab -->
+                        <div id="eligibleCandidatesView" class="app-card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-custom align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Rank</th>
+                                            <th>Student ID</th>
+                                            <th>Full Name</th>
+                                            <th>Department</th>
+                                            <th>CGPA</th>
+                                            <th>Backlogs</th>
+                                            <th>Matched Skills</th>
+                                            <th>Ranking Score</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="eligibleTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Ineligible Candidates Table Tab -->
+                        <div id="ineligibleCandidatesView" class="app-card-body p-0 d-none">
+                            <div class="table-responsive">
+                                <table class="table table-custom align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Student ID</th>
+                                            <th>Full Name</th>
+                                            <th>Department</th>
+                                            <th>CGPA</th>
+                                            <th>Backlogs</th>
+                                            <th>Technical Skills</th>
+                                            <th>Rejection Reason</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ineligibleTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- 5. REPORTS & SHORTLIST HISTORY VIEW -->
+            <!-- ============================================================ -->
+            <section id="view-reports" class="app-view d-none">
+                <div class="app-card">
+                    <div class="app-card-header">
+                        <h5><i class="bi bi-journal-text text-primary me-2"></i>Historical Shortlisting Archives</h5>
+                        <button class="btn btn-sm btn-primary" onclick="navigate('shortlist')">
+                            <i class="bi bi-funnel-fill me-1"></i> New Shortlist
+                        </button>
+                    </div>
+
+                    <div class="app-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-custom align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Shortlist ID</th>
+                                        <th>Generated Date & Time</th>
+                                        <th>Company</th>
+                                        <th>Job Role</th>
+                                        <th>Weights (C/S/A)</th>
+                                        <th>Total Evaluated</th>
+                                        <th>Eligible</th>
+                                        <th>Ineligible</th>
+                                        <th class="text-end">Export & Review</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportsTableBody">
+                                    <tr><td colspan="9" class="text-center py-4 text-muted">No historical shortlists found.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- 6. SETTINGS & DOCUMENTATION VIEW -->
+            <!-- ============================================================ -->
+            <section id="view-settings" class="app-view d-none">
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="app-card mb-4">
+                            <div class="app-card-header">
+                                <h5><i class="bi bi-calculator text-primary me-2"></i>Candidate Ranking Algorithm Formula</h5>
+                            </div>
+                            <div class="app-card-body">
+                                <p class="text-muted small">
+                                    The portal uses a 100% rule-based, deterministic scoring algorithm. Each component is normalized out of 100 before applying user-configurable weights:
+                                </p>
+                                <div class="bg-light p-3 rounded-3 border mb-3">
+                                    <code>Score = (Normalized_CGPA × w₁%) + (Skill_Match_% × w₂%) + (Cert_Score × w₃%)</code>
+                                </div>
+                                <ul class="small text-muted ps-3 mb-3">
+                                    <li><strong>Normalized CGPA:</strong> <code>(CGPA / 10.0) × 100.0</code></li>
+                                    <li><strong>Skill Match %:</strong> <code>(Matched_Required_Skills / Total_Required_Skills) × 100.0</code></li>
+                                    <li><strong>Certifications Score:</strong> Maintained score out of 100 (Default: 0.0)</li>
+                                    <li><strong>Tie-Breaking Rule:</strong> If two candidates have identical composite scores, higher CGPA takes precedence.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="app-card mb-4">
+                            <div class="app-card-header">
+                                <h5><i class="bi bi-mortarboard text-primary me-2"></i>College Viva & Project Details</h5>
+                            </div>
+                            <div class="app-card-body">
+                                <table class="table table-sm table-borderless small mb-0">
+                                    <tr>
+                                        <td class="text-muted fw-semibold" style="width: 140px;">Project Title:</td>
+                                        <td>Campus Placement Drive Candidate Tracking & Shortlisting Portal</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted fw-semibold">Backend:</td>
+                                        <td>Java 21, Spring Boot 3.2.5, Spring Data JPA</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted fw-semibold">Frontend:</td>
+                                        <td>HTML5, CSS3, JavaScript (Fetch REST API), Bootstrap 5, Chart.js</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted fw-semibold">Database:</td>
+                                        <td>MySQL (with H2 in-memory development profile fallback)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted fw-semibold">Export Formats:</td>
+                                        <td>RFC 4180 Escaped CSV, Formatted JSON</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODALS -->
+<!-- ============================================================ -->
+
+<!-- Modal: Add/Edit Student -->
+<div class="modal fade" id="studentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="studentModalTitle">Add New Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="studentForm" onsubmit="saveStudent(event)">
+                <input type="hidden" id="studentDbId">
+                <div class="modal-body">
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Student ID *</label>
+                            <input type="text" id="stuStudentId" class="form-control form-control-sm" required placeholder="e.g. STU2027001">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Full Name *</label>
+                            <input type="text" id="stuFullName" class="form-control form-control-sm" required placeholder="e.g. Aarav Sharma">
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Department *</label>
+                            <select id="stuDepartment" class="form-select form-select-sm" required>
+                                <option value="CSE">CSE</option>
+                                <option value="IT">IT</option>
+                                <option value="ECE">ECE</option>
+                                <option value="MECH">MECH</option>
+                                <option value="CIVIL">CIVIL</option>
+                                <option value="EEE">EEE</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Graduation Year *</label>
+                            <input type="number" id="stuGradYear" class="form-control form-control-sm" required value="2027" min="2000" max="2035">
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">CGPA (0 - 10) *</label>
+                            <input type="number" id="stuCgpa" class="form-control form-control-sm" step="0.01" min="0" max="10" required placeholder="e.g. 8.5">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Active Backlogs *</label>
+                            <input type="number" id="stuBacklogs" class="form-control form-control-sm" min="0" required value="0">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Email Address *</label>
+                        <input type="email" id="stuEmail" class="form-control form-control-sm" required placeholder="student@campus.edu">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Technical Skills (Comma-separated)</label>
+                        <input type="text" id="stuSkills" class="form-control form-control-sm" placeholder="e.g. Java, SQL, Python, React">
+                        <div class="form-text small">Enter skills separated by commas.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Certifications/Achievements Score (0 - 100)</label>
+                        <input type="number" id="stuCertScore" class="form-control form-control-sm" min="0" max="100" value="0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="btnSaveStudent" class="btn btn-sm btn-primary">Save Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Import CSV -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Students via CSV</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="importForm" onsubmit="uploadStudentCsv(event)">
+                <div class="modal-body">
+                    <p class="small text-muted mb-3">
+                        Upload a CSV file containing candidate records. Headers supported:
+                        <code>studentId, fullName, department, cgpa, activeBacklogs, email, graduationYear, skills, certificationsScore</code>
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Select CSV File</label>
+                        <input type="file" id="csvFileInput" class="form-control" accept=".csv" required>
+                    </div>
+                    <div class="alert alert-info py-2 px-3 small mb-0">
+                        <i class="bi bi-info-circle me-1"></i> You can test using the included <code>sample_students.csv</code> file!
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="btnUploadCsv" class="btn btn-sm btn-success">
+                        <i class="bi bi-upload me-1"></i> Start Import
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add/Edit Company -->
+<div class="modal fade" id="companyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="companyModalTitle">Register Visiting Company</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="companyForm" onsubmit="saveCompany(event)">
+                <input type="hidden" id="companyDbId">
+                <div class="modal-body">
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Company Code</label>
+                            <input type="text" id="compCode" class="form-control form-control-sm" placeholder="e.g. CMP-001">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Company Name *</label>
+                            <input type="text" id="compName" class="form-control form-control-sm" required placeholder="e.g. Example Technologies">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Job Role *</label>
+                        <input type="text" id="compRole" class="form-control form-control-sm" required placeholder="e.g. Software Development Engineer">
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Minimum CGPA *</label>
+                            <input type="number" id="compMinCgpa" class="form-control form-control-sm" step="0.1" min="0" max="10" required value="7.5">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Max Backlogs Permitted *</label>
+                            <input type="number" id="compMaxBacklogs" class="form-control form-control-sm" min="0" required value="0">
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Skill Matching Mode *</label>
+                            <select id="compSkillMode" class="form-select form-select-sm" required>
+                                <option value="ALL">ALL (Must possess all skills)</option>
+                                <option value="ANY">ANY (At least one skill)</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Batch / Grad Year</label>
+                            <input type="number" id="compGradYear" class="form-control form-control-sm" placeholder="e.g. 2027 (blank = any)">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Required Technical Skills (Comma-separated)</label>
+                        <input type="text" id="compSkills" class="form-control form-control-sm" placeholder="e.g. Java, SQL">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Eligible Departments (Comma-separated)</label>
+                        <input type="text" id="compDepts" class="form-control form-control-sm" placeholder="e.g. CSE, IT (blank = all departments)">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="btnSaveCompany" class="btn btn-sm btn-primary">Save Company Criteria</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Generic Delete Confirmation -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <i class="bi bi-exclamation-triangle-fill text-danger fs-1 mb-2 d-block"></i>
+                <h6 class="fw-bold mb-1">Confirm Deletion</h6>
+                <p class="text-muted small mb-3" id="deleteModalMessage">Are you sure you want to delete this record? This action cannot be undone.</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="btnConfirmDelete" class="btn btn-sm btn-danger px-3">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: View Historical Shortlist Details -->
+<div class="modal fade" id="historyDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="historyModalTitle">Shortlist Session Archive</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="p-3 bg-light border-bottom">
+                    <div id="historyModalCriteria" class="small text-muted"></div>
+                </div>
+                <div class="table-responsive" style="max-height: 480px;">
+                    <table class="table table-custom align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Dept</th>
+                                <th>CGPA</th>
+                                <th>Backlogs</th>
+                                <th>Ranking Score</th>
+                                <th>Eligibility Status</th>
+                                <th>Rejection Reasons</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyModalTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container for Notifications -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+    <div id="appToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage">Action completed successfully</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Application Frontend Logic -->
+<script src="/js/app.js"></script>
+</body>
+</html>
