@@ -113,10 +113,9 @@ body::before {
 }
 
 .sidebar-header {
-  padding: 1.5rem 1.25rem 1.25rem;
+  padding: 1.5rem 1.4rem 1.25rem;
   display: flex;
-  align-items: center;
-  gap: 0.875rem;
+  flex-direction: column;
   border-bottom: 1px solid var(--apple-separator);
 }
 
