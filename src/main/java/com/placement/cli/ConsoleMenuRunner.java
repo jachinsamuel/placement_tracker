@@ -95,12 +95,15 @@ public class ConsoleMenuRunner implements CommandLineRunner {
                     handleViewDashboard();
                     break;
                 case "8":
-                    System.out.println("\n[!] Exiting Terminal Interactive Console.");
-                    System.out.println("[*] Note: The Web Server is still running live at http://localhost:8080\n");
-                    running = false;
+                case "q":
+                case "exit":
+                case "quit":
+                    System.out.println("\n[!] Shutting down Campus Placement Portal...");
+                    System.out.println("[*] Goodbye!\n");
+                    System.exit(0);
                     break;
                 default:
-                    System.out.println("\n[X] Invalid option. Please enter a number between 1 and 8.\n");
+                    System.out.println("\n[X] Invalid option. Please enter a number between 1 and 8 (or 'q' to exit).\n");
             }
         }
     }
@@ -114,7 +117,7 @@ public class ConsoleMenuRunner implements CommandLineRunner {
         System.out.println(" [5] Run Shortlisting & Ranking Engine");
         System.out.println(" [6] View Historical Shortlists");
         System.out.println(" [7] View Placement Analytics Summary");
-        System.out.println(" [8] Exit Terminal Console");
+        System.out.println(" [8] Exit & Shutdown Application");
         System.out.println("--------------------------------------------------------------");
     }
 

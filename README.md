@@ -293,50 +293,101 @@ Each component is normalized to a percentage score out of 100 before applying us
 
 ## 🚀 How to Run Locally
 
-### Method 1: Instant Demo Mode (Zero Setup H2 Profile)
-*No MySQL installation required! Starts immediately with pre-loaded students and companies in memory.*
+### ⚡ Quickest Way (One-Click Launcher)
+
+Run either launcher script from the project folder:
 
 ```powershell
-# Option A: Run directly using Maven
-mvn spring-boot:run -D"spring-boot.run.profiles=dev"
+# In PowerShell / Windows Terminal:
+.\run.ps1
 
-# Option B: Run the packaged JAR file
-java -jar target/placement-portal-1.0.0.jar --spring.profiles.active=dev
+# In Windows Command Prompt (CMD) or Double-Click in File Explorer:
+run.bat
 ```
 
-Once the terminal prints `Started PlacementPortalApplication`, open:
-👉 **[http://localhost:8080](http://localhost:8080)**
+This launches the **Interactive Terminal Console** in your terminal and starts the **Web Portal** at [http://localhost:8080](http://localhost:8080) simultaneously!
 
 ---
 
-### Method 2: MySQL Production Mode
+### 🖥️ Interactive Terminal Console Mode
+
+The application includes a command-line interface (CLI) that runs concurrently with the web server. You can manage students, register visiting companies, configure weights, and run the shortlisting engine directly from your terminal.
+
+```
+============================================================================
+   CAMPUS PLACEMENT SHORTLISTING SYSTEM - INTERACTIVE TERMINAL CONSOLE
+   (Web Portal running simultaneously at http://localhost:8080)
+============================================================================
+
+--------------------------------------------------------------
+ [1] Add New Student
+ [2] View All Registered Students
+ [3] Add New Visiting Company
+ [4] View All Visiting Companies
+ [5] Run Shortlisting & Ranking Engine
+ [6] View Historical Shortlists
+ [7] View Placement Analytics Summary
+ [8] Exit & Shutdown Application
+--------------------------------------------------------------
+Enter choice [1-8]: 
+```
+
+#### Terminal Menu Options:
+1. **`[1] Add New Student`**: Prompts step-by-step for Student ID, Full Name, Department, CGPA, Backlogs, Email, Batch Year, Skills (comma-separated), and Certifications Score.
+2. **`[2] View All Registered Students`**: Renders an ASCII table showing IDs, Names, Departments, CGPA, Backlogs, Batches, and Skills.
+3. **`[3] Add New Visiting Company`**: Prompts for Company Code, Name, Job Role, Min CGPA Cutoff, Max Backlogs, Skill Mode (`ALL` vs `ANY`), Required Skills, and Eligible Departments.
+4. **`[4] View All Visiting Companies`**: Displays a formatted directory table of all registered hiring companies and their criteria.
+5. **`[5] Run Shortlisting & Ranking Engine`**:
+   - Lists registered companies to pick from.
+   - Allows choosing default weights (60% CGPA, 30% Skills, 10% Certifications) or entering custom percentage weights.
+   - Outputs ranked qualified candidates with `#1 [1st]`, `#2 [2nd]`, `#3 [3rd]` badges and composite scores out of 100.
+   - Displays ineligible candidates with exact human-readable rejection reasons (e.g., *"CGPA below cutoff"*, *"Missing required skills: [Java, SQL]"*).
+   - Automatically saves the session snapshot to database history.
+6. **`[6] View Historical Shortlists`**: View previous shortlisting runs, evaluated counts, and weight configurations.
+7. **`[7] View Placement Analytics Summary`**: Quick high-level summary of total students, active companies, and drives run.
+8. **`[8] Exit & Shutdown Application`**: Cleanly shuts down the console and server process.
+
+> **💡 Real-Time Synchronization**: The terminal CLI and web UI share the exact same underlying database. Any student or company added via the terminal appears instantly in the browser at `http://localhost:8080`, and vice versa!
+
+---
+
+### 🌐 Manual Launch Options
+
+#### Method 1: Pre-Built JAR (Recommended)
+```powershell
+java -jar target/placement-portal-1.0.0.jar --spring.profiles.active=dev
+```
+
+#### Method 2: Maven Run
+```powershell
+mvn spring-boot:run -D"spring-boot.run.profiles=dev"
+```
+
+Once running, access the web portal at:
+👉 **[http://localhost:8080](http://localhost:8080)** *(No login required)*
+
+---
+
+### 🐬 MySQL Production Mode (Optional)
+
+By default, the application runs on an in-memory zero-setup H2 database (`dev` profile). If you wish to persist data in MySQL:
 
 #### Step 1: Create Database
-Open MySQL Workbench or MySQL Command Line and run:
 ```sql
 CREATE DATABASE IF NOT EXISTS placement_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-#### Step 2: Configure Credentials
-Edit `src/main/resources/application.properties` with your MySQL password:
+#### Step 2: Configure Credentials in `application.properties`
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/placement_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
 spring.datasource.username=root
 spring.datasource.password=your_mysql_password
 ```
 
-*(Alternatively, pass credentials via PowerShell without modifying files):*
-```powershell
-$env:SPRING_DATASOURCE_USERNAME="root"
-$env:SPRING_DATASOURCE_PASSWORD="your_mysql_password"
-```
-
-#### Step 3: Run the Application
+#### Step 3: Run with Production Profile
 ```powershell
 mvn spring-boot:run
 ```
-Hibernate will automatically create all tables, and `DataInitializer` will populate demo records.
-Open: 👉 **[http://localhost:8080](http://localhost:8080)**
 
 ---
 
