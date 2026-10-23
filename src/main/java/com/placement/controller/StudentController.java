@@ -11,10 +11,20 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 /**
  * REST Controller for Student Management operations.
- * Simple methods mapping HTTP requests directly to database operations.
+ * 
+ * Beginner Java Explanation:
+ * A Controller connects user actions in the browser to Java methods.
+ * Each method handles an HTTP route:
+ *   - GET    /api/students          -> Get all students
+ *   - GET    /api/students/{id}     -> Get student by ID
+ *   - POST   /api/students          -> Add new student
+ *   - PUT    /api/students/{id}     -> Update student details
+ *   - DELETE /api/students/{id}     -> Remove student
  */
 @RestController
 @RequestMapping("/api/students")
@@ -41,8 +51,11 @@ public class StudentController {
 
     @GetMapping("/{id}")
     public Student getStudentById(@PathVariable Long id) {
-        return studentService.getStudentById(id)
-                .orElseThrow(() -> new java.util.NoSuchElementException("Student not found with ID: " + id));
+        Optional<Student> studentOpt = studentService.getStudentById(id);
+        if (!studentOpt.isPresent()) {
+            throw new NoSuchElementException("Student not found with ID: " + id);
+        }
+        return studentOpt.get();
     }
 
     @PostMapping
@@ -59,9 +72,9 @@ public class StudentController {
     @DeleteMapping("/{id}")
     public Map<String, String> deleteStudent(@PathVariable Long id) {
         studentService.deleteStudent(id);
-        Map<String, String> res = new HashMap<>();
-        res.put("message", "Student deleted successfully");
-        return res;
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Student deleted successfully");
+        return response;
     }
 
     @PostMapping(value = "/import-csv", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -72,10 +85,10 @@ public class StudentController {
 
         try {
             int count = studentService.importStudentsFromCsv(file.getInputStream());
-            Map<String, Object> res = new HashMap<>();
-            res.put("message", "Import completed successfully");
-            res.put("importedCount", count);
-            return ResponseEntity.ok(res);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Import completed successfully");
+            response.put("importedCount", count);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             throw new RuntimeException("Failed to import CSV: " + e.getMessage(), e);
         }

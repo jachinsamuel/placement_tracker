@@ -18,7 +18,14 @@ import java.util.*;
 
 /**
  * Module 1: Student Management Service.
- * Handles Student operations: create, read, update, delete, search, filter, and CSV import.
+ * 
+ * Beginner Java Explanation:
+ * This class handles standard CRUD operations for students:
+ *   - Create (Add new student with validations)
+ *   - Read   (Get all students, or find student by ID or search)
+ *   - Update (Modify an existing student's academic record or skills)
+ *   - Delete (Remove a student from the system)
+ *   - CSV Import (Load student spreadsheet records directly)
  */
 @Service
 public class StudentService {
@@ -31,27 +38,44 @@ public class StudentService {
         this.skillRepository = skillRepository;
     }
 
+    /**
+     * Get all registered students from database.
+     */
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
     }
 
+    /**
+     * Find a student by database ID.
+     */
     public Optional<Student> getStudentById(Long id) {
         return studentRepository.findById(id);
     }
 
+    /**
+     * Register a new student with validation.
+     */
     @Transactional
     public Student createStudent(Student student) {
-        // Validation: Unique Student ID
-        if (studentRepository.existsByStudentId(student.getStudentId().trim())) {
-            throw new IllegalArgumentException("Student ID '" + student.getStudentId() + "' already exists");
+        // Validation 1: Student ID cannot be empty and must be unique
+        String stuId = student.getStudentId() != null ? student.getStudentId().trim() : "";
+        if (stuId.isEmpty()) {
+            throw new IllegalArgumentException("Student ID cannot be empty");
+        }
+        if (studentRepository.existsByStudentId(stuId)) {
+            throw new IllegalArgumentException("Student ID '" + stuId + "' already exists");
         }
 
-        // Validation: Unique Email
-        if (studentRepository.existsByEmail(student.getEmail().trim())) {
-            throw new IllegalArgumentException("Email address '" + student.getEmail() + "' is already registered");
+        // Validation 2: Email cannot be empty and must be unique
+        String email = student.getEmail() != null ? student.getEmail().trim() : "";
+        if (email.isEmpty()) {
+            throw new IllegalArgumentException("Email address cannot be empty");
+        }
+        if (studentRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Email address '" + email + "' is already registered");
         }
 
-        // Map skills entered in the form
+        // Parse technical skills entered by user (e.g. "Java, Python, SQL")
         if (student.getSkillNames() != null) {
             student.setSkills(parseSkills(student.getSkillNames()));
         }
@@ -59,31 +83,42 @@ public class StudentService {
         return studentRepository.save(student);
     }
 
+    /**
+     * Update an existing student's details.
+     */
     @Transactional
     public Student updateStudent(Long id, Student incomingData) {
-        Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Student not found with ID: " + id));
+        // Step 1: Check if student exists
+        Optional<Student> studentOpt = studentRepository.findById(id);
+        if (!studentOpt.isPresent()) {
+            throw new NoSuchElementException("Student not found with ID: " + id);
+        }
+        Student student = studentOpt.get();
 
-        // Check if student ID changed to an existing ID
-        if (!student.getStudentId().equalsIgnoreCase(incomingData.getStudentId().trim())
-                && studentRepository.existsByStudentId(incomingData.getStudentId().trim())) {
-            throw new IllegalArgumentException("Student ID '" + incomingData.getStudentId() + "' is already in use");
+        String newStudentId = incomingData.getStudentId().trim();
+        String newEmail = incomingData.getEmail().trim();
+
+        // Check if student ID changed to an ID already taken by someone else
+        if (!student.getStudentId().equalsIgnoreCase(newStudentId) && studentRepository.existsByStudentId(newStudentId)) {
+            throw new IllegalArgumentException("Student ID '" + newStudentId + "' is already in use");
         }
 
-        // Check if email changed to an existing email
-        if (!student.getEmail().equalsIgnoreCase(incomingData.getEmail().trim())
-                && studentRepository.existsByEmail(incomingData.getEmail().trim())) {
-            throw new IllegalArgumentException("Email '" + incomingData.getEmail() + "' is already in use");
+        // Check if email changed to an email already taken by someone else
+        if (!student.getEmail().equalsIgnoreCase(newEmail) && studentRepository.existsByEmail(newEmail)) {
+            throw new IllegalArgumentException("Email '" + newEmail + "' is already in use");
         }
 
-        student.setStudentId(incomingData.getStudentId().trim());
+        // Step 2: Copy updated values into student entity
+        student.setStudentId(newStudentId);
         student.setFullName(incomingData.getFullName().trim());
         student.setDepartment(incomingData.getDepartment().trim());
         student.setCgpa(incomingData.getCgpa());
         student.setActiveBacklogs(incomingData.getActiveBacklogs());
-        student.setEmail(incomingData.getEmail().trim());
+        student.setEmail(newEmail);
         student.setGraduationYear(incomingData.getGraduationYear());
-        student.setCertificationsScore(incomingData.getCertificationsScore() != null ? incomingData.getCertificationsScore() : 0.0);
+
+        double certScore = (incomingData.getCertificationsScore() != null) ? incomingData.getCertificationsScore() : 0.0;
+        student.setCertificationsScore(certScore);
 
         if (incomingData.getSkillNames() != null) {
             student.setSkills(parseSkills(incomingData.getSkillNames()));
@@ -92,6 +127,9 @@ public class StudentService {
         return studentRepository.save(student);
     }
 
+    /**
+     * Delete a student by ID.
+     */
     @Transactional
     public void deleteStudent(Long id) {
         if (!studentRepository.existsById(id)) {
@@ -100,14 +138,20 @@ public class StudentService {
         studentRepository.deleteById(id);
     }
 
+    /**
+     * Search students by name or student ID.
+     */
     public List<Student> searchStudents(String query) {
         if (query == null || query.trim().isEmpty()) {
             return studentRepository.findAll();
         }
-        String clean = query.trim();
-        return studentRepository.findByFullNameContainingIgnoreCaseOrStudentIdContainingIgnoreCase(clean, clean);
+        String cleanQuery = query.trim();
+        return studentRepository.findByFullNameContainingIgnoreCaseOrStudentIdContainingIgnoreCase(cleanQuery, cleanQuery);
     }
 
+    /**
+     * Filter students by department (e.g. "CSE", "IT").
+     */
     public List<Student> filterByDepartment(String department) {
         if (department == null || department.trim().isEmpty() || "ALL".equalsIgnoreCase(department.trim())) {
             return studentRepository.findAll();
@@ -116,7 +160,7 @@ public class StudentService {
     }
 
     /**
-     * Imports students from a CSV file.
+     * Imports students from a CSV spreadsheet.
      */
     @Transactional
     public int importStudentsFromCsv(InputStream inputStream) {
@@ -147,20 +191,28 @@ public class StudentService {
                 }
 
                 if (studentRepository.existsByStudentId(studentId) || studentRepository.existsByEmail(email)) {
-                    continue; // Skip existing duplicate
+                    continue; // Skip duplicate record
                 }
 
                 double cgpa = 0.0;
-                try { cgpa = Double.parseDouble(cgpaStr); } catch (Exception ignored) {}
+                try {
+                    cgpa = Double.parseDouble(cgpaStr);
+                } catch (Exception ignored) {}
 
                 int backlogs = 0;
-                try { backlogs = Integer.parseInt(backlogsStr); } catch (Exception ignored) {}
+                try {
+                    backlogs = Integer.parseInt(backlogsStr);
+                } catch (Exception ignored) {}
 
                 int gradYear = 2026;
-                try { gradYear = Integer.parseInt(gradYearStr); } catch (Exception ignored) {}
+                try {
+                    gradYear = Integer.parseInt(gradYearStr);
+                } catch (Exception ignored) {}
 
                 double certScore = 0.0;
-                try { certScore = Double.parseDouble(certScoreStr); } catch (Exception ignored) {}
+                try {
+                    certScore = Double.parseDouble(certScoreStr);
+                } catch (Exception ignored) {}
 
                 Student student = new Student(studentId, fullName, department, cgpa, backlogs, email, gradYear);
                 student.setCertificationsScore(certScore);
@@ -179,15 +231,27 @@ public class StudentService {
     }
 
     private String getCsvValue(CSVRecord record, String... headers) {
-        for (String h : headers) {
+        for (int i = 0; i < headers.length; i++) {
+            String h = headers[i];
             if (record.isMapped(h)) {
                 String val = record.get(h);
-                if (val != null) return val.trim();
+                if (val != null) {
+                    return val.trim();
+                }
             }
         }
         return "";
     }
 
+    /**
+     * Splits comma-separated skills and retrieves or creates Skill entities.
+     * 
+     * Beginner Java logic:
+     * - Splits "Java, SQL, Python" into individual words.
+     * - Looks up each skill in database.
+     * - If found -> uses existing skill.
+     * - If not found -> saves new skill to database.
+     */
     public Set<Skill> parseSkills(String skillsString) {
         Set<Skill> result = new HashSet<>();
         if (skillsString == null || skillsString.trim().isEmpty()) {
@@ -195,11 +259,16 @@ public class StudentService {
         }
 
         String[] parts = skillsString.split("[,;]");
-        for (String part : parts) {
-            String name = part.trim();
+        for (int i = 0; i < parts.length; i++) {
+            String name = parts[i].trim();
             if (!name.isEmpty()) {
-                Skill skill = skillRepository.findByNameIgnoreCase(name)
-                        .orElseGet(() -> skillRepository.save(new Skill(name)));
+                Optional<Skill> existing = skillRepository.findByNameIgnoreCase(name);
+                Skill skill;
+                if (existing.isPresent()) {
+                    skill = existing.get();
+                } else {
+                    skill = skillRepository.save(new Skill(name));
+                }
                 result.add(skill);
             }
         }

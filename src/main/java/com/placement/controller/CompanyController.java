@@ -8,9 +8,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 /**
  * REST Controller for Company Management and Criteria operations.
+ * 
+ * Beginner Java Explanation:
+ * Handles HTTP requests for visiting companies:
+ *   - GET    /api/companies               -> List all companies
+ *   - GET    /api/companies/{id}          -> Get company by ID
+ *   - POST   /api/companies               -> Register new company
+ *   - PUT    /api/companies/{id}          -> Update company criteria
+ *   - DELETE /api/companies/{id}          -> Delete company
+ *   - PUT    /api/companies/{id}/toggle-active -> Toggle drive status
  */
 @RestController
 @RequestMapping("/api/companies")
@@ -33,8 +44,11 @@ public class CompanyController {
 
     @GetMapping("/{id}")
     public Company getCompanyById(@PathVariable Long id) {
-        return companyService.getCompanyById(id)
-                .orElseThrow(() -> new java.util.NoSuchElementException("Company not found with ID: " + id));
+        Optional<Company> companyOpt = companyService.getCompanyById(id);
+        if (!companyOpt.isPresent()) {
+            throw new NoSuchElementException("Company not found with ID: " + id);
+        }
+        return companyOpt.get();
     }
 
     @PostMapping
@@ -51,9 +65,9 @@ public class CompanyController {
     @DeleteMapping("/{id}")
     public Map<String, String> deleteCompany(@PathVariable Long id) {
         companyService.deleteCompany(id);
-        Map<String, String> res = new HashMap<>();
-        res.put("message", "Company deleted successfully");
-        return res;
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Company deleted successfully");
+        return response;
     }
 
     @PutMapping("/{id}/toggle-active")
@@ -64,9 +78,9 @@ public class CompanyController {
     @GetMapping("/{id}/eligible-count")
     public Map<String, Object> getEligibleCount(@PathVariable Long id) {
         int count = companyService.countEligibleCandidates(id);
-        Map<String, Object> res = new HashMap<>();
-        res.put("companyId", id);
-        res.put("eligibleCount", count);
-        return res;
+        Map<String, Object> response = new HashMap<>();
+        response.put("companyId", id);
+        response.put("eligibleCount", count);
+        return response;
     }
 }

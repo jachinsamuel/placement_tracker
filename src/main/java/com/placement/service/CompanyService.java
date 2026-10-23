@@ -13,7 +13,13 @@ import java.util.*;
 
 /**
  * Module 2: Company Management Service.
- * Manages visiting companies, eligibility requirements, and real-time eligible preview.
+ * 
+ * Beginner Java Explanation:
+ * This class handles company records and eligibility criteria:
+ *   - Add visiting companies with job role and minimum cutoffs.
+ *   - Edit criteria (CGPA cutoff, max backlogs, required skills, allowed departments).
+ *   - Toggle company active/inactive status.
+ *   - Count how many registered students qualify in real time.
  */
 @Service
 public class CompanyService {
@@ -45,12 +51,18 @@ public class CompanyService {
         return companyRepository.findById(id);
     }
 
+    /**
+     * Registers a new visiting company.
+     */
     @Transactional
     public Company createCompany(Company company) {
+        // If no code is entered, generate a simple code like CMP-101
         if (company.getCompanyCode() == null || company.getCompanyCode().trim().isEmpty()) {
-            company.setCompanyCode("CMP-" + (System.currentTimeMillis() % 10000));
+            long randomNum = (System.currentTimeMillis() % 9000) + 1000;
+            company.setCompanyCode("CMP-" + randomNum);
         }
 
+        // Parse required skills entered in form (e.g. "Java, SQL")
         if (company.getRequiredSkillNames() != null) {
             company.setRequiredSkills(parseSkills(company.getRequiredSkillNames()));
         }
@@ -58,10 +70,16 @@ public class CompanyService {
         return companyRepository.save(company);
     }
 
+    /**
+     * Updates an existing company's recruitment criteria.
+     */
     @Transactional
     public Company updateCompany(Long id, Company incoming) {
-        Company company = companyRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Company not found with ID: " + id));
+        Optional<Company> companyOpt = companyRepository.findById(id);
+        if (!companyOpt.isPresent()) {
+            throw new NoSuchElementException("Company not found with ID: " + id);
+        }
+        Company company = companyOpt.get();
 
         company.setName(incoming.getName().trim());
         company.setJobRole(incoming.getJobRole().trim());
@@ -70,7 +88,9 @@ public class CompanyService {
         company.setSkillMatchingMode(incoming.getSkillMatchingMode());
         company.setEligibleDepartments(incoming.getEligibleDepartments());
         company.setEligibleGraduationYear(incoming.getEligibleGraduationYear());
-        company.setActive(incoming.getActive() != null ? incoming.getActive() : true);
+
+        boolean isActive = (incoming.getActive() != null) ? incoming.getActive() : true;
+        company.setActive(isActive);
 
         if (incoming.getRequiredSkillNames() != null) {
             company.setRequiredSkills(parseSkills(incoming.getRequiredSkillNames()));
@@ -79,6 +99,9 @@ public class CompanyService {
         return companyRepository.save(company);
     }
 
+    /**
+     * Deletes a company by ID.
+     */
     @Transactional
     public void deleteCompany(Long id) {
         if (!companyRepository.existsById(id)) {
@@ -87,29 +110,49 @@ public class CompanyService {
         companyRepository.deleteById(id);
     }
 
+    /**
+     * Toggles whether a company drive is currently active or closed.
+     */
     @Transactional
     public Company toggleCompanyActive(Long id) {
-        Company company = companyRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Company not found with ID: " + id));
-        company.setActive(!Boolean.TRUE.equals(company.getActive()));
+        Optional<Company> companyOpt = companyRepository.findById(id);
+        if (!companyOpt.isPresent()) {
+            throw new NoSuchElementException("Company not found with ID: " + id);
+        }
+        Company company = companyOpt.get();
+
+        boolean currentStatus = Boolean.TRUE.equals(company.getActive());
+        company.setActive(!currentStatus);
         return companyRepository.save(company);
     }
 
+    /**
+     * Counts how many currently registered students meet all criteria for this company.
+     */
     public int countEligibleCandidates(Long companyId) {
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new NoSuchElementException("Company not found with ID: " + companyId));
+        Optional<Company> companyOpt = companyRepository.findById(companyId);
+        if (!companyOpt.isPresent()) {
+            throw new NoSuchElementException("Company not found with ID: " + companyId);
+        }
+        Company company = companyOpt.get();
 
         List<Student> students = studentRepository.findAll();
-        int eligible = 0;
-        for (Student s : students) {
+        int eligibleCount = 0;
+
+        for (int i = 0; i < students.size(); i++) {
+            Student s = students.get(i);
             EligibilityService.EvaluationResult res = eligibilityService.evaluate(s, company);
             if (res.isEligible()) {
-                eligible++;
+                eligibleCount++;
             }
         }
-        return eligible;
+
+        return eligibleCount;
     }
 
+    /**
+     * Splits comma-separated skills and retrieves or creates Skill entities.
+     */
     public Set<Skill> parseSkills(String skillsString) {
         Set<Skill> result = new HashSet<>();
         if (skillsString == null || skillsString.trim().isEmpty()) {
@@ -117,11 +160,16 @@ public class CompanyService {
         }
 
         String[] parts = skillsString.split("[,;]");
-        for (String part : parts) {
-            String name = part.trim();
+        for (int i = 0; i < parts.length; i++) {
+            String name = parts[i].trim();
             if (!name.isEmpty()) {
-                Skill skill = skillRepository.findByNameIgnoreCase(name)
-                        .orElseGet(() -> skillRepository.save(new Skill(name)));
+                Optional<Skill> existing = skillRepository.findByNameIgnoreCase(name);
+                Skill skill;
+                if (existing.isPresent()) {
+                    skill = existing.get();
+                } else {
+                    skill = skillRepository.save(new Skill(name));
+                }
                 result.add(skill);
             }
         }

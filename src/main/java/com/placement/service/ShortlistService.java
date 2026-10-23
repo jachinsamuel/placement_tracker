@@ -20,8 +20,15 @@ import java.util.*;
 
 /**
  * Module 5: Shortlist Generation and Export Service.
- * Evaluates all candidates against company criteria, ranks eligible candidates,
- * stores history, and exports results to CSV and JSON formats.
+ * 
+ * Beginner Java Explanation:
+ * This service coordinates the full shortlisting process for a company:
+ *   Step 1: Fetch the company from database.
+ *   Step 2: Fetch all registered students.
+ *   Step 3: Evaluate each student using EligibilityService (separate into Eligible vs Ineligible).
+ *   Step 4: Rank all eligible students using RankingService (assign #1, #2, #3 based on weighted score).
+ *   Step 5: Save the complete shortlist session to database.
+ *   Step 6: Provide one-click CSV and JSON exports for download.
  */
 @Service
 public class ShortlistService {
@@ -48,23 +55,30 @@ public class ShortlistService {
     }
 
     /**
-     * Runs the candidate shortlisting & ranking pipeline.
+     * Generates a ranked shortlist of candidates for a visiting company.
      */
     @Transactional
     public Shortlist generateShortlist(Long companyId, Double cgpaWeight, Double skillsWeight, Double certsWeight) {
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new NoSuchElementException("Company not found with ID: " + companyId));
+        // Step 1: Find company in database
+        Optional<Company> companyOpt = companyRepository.findById(companyId);
+        if (!companyOpt.isPresent()) {
+            throw new NoSuchElementException("Company not found with ID: " + companyId);
+        }
+        Company company = companyOpt.get();
 
-        double wCgpa = cgpaWeight != null ? cgpaWeight : 60.0;
-        double wSkills = skillsWeight != null ? skillsWeight : 30.0;
-        double wCerts = certsWeight != null ? certsWeight : 10.0;
+        // Step 2: Validate ranking weights (default: 60% CGPA, 30% Skills, 10% Certifications)
+        double wCgpa = (cgpaWeight != null) ? cgpaWeight : 60.0;
+        double wSkills = (skillsWeight != null) ? skillsWeight : 30.0;
+        double wCerts = (certsWeight != null) ? certsWeight : 10.0;
 
         if (Math.abs((wCgpa + wSkills + wCerts) - 100.0) > 0.001) {
             throw new IllegalArgumentException("Ranking weights must add up to exactly 100%");
         }
 
+        // Step 3: Get all registered students
         List<Student> allStudents = studentRepository.findAll();
 
+        // Create the new Shortlist header entity
         Shortlist shortlist = new Shortlist();
         shortlist.setCompanyId(company.getId());
         shortlist.setCompanyName(company.getName());
@@ -75,7 +89,7 @@ public class ShortlistService {
         shortlist.setCertsWeight(wCerts);
         shortlist.setTotalEvaluated(allStudents.size());
 
-        // Snapshot of rules for historical reproduction
+        // Save a human-readable snapshot of criteria
         String criteriaSnapshot = "Min CGPA: " + company.getMinCgpa()
                 + " | Max Backlogs: " + company.getMaxBacklogs()
                 + " | Skills: [" + company.getRequiredSkillsSummary() + "] (" + company.getSkillMatchingMode() + ")"
@@ -86,14 +100,17 @@ public class ShortlistService {
         List<RankingService.RankedCandidate> eligibleRankContainers = new ArrayList<>();
         List<ShortlistCandidate> ineligibleCandidates = new ArrayList<>();
 
-        // Step 1: Evaluate each student
-        for (Student student : allStudents) {
+        // Step 4: Loop through each student and test eligibility
+        for (int i = 0; i < allStudents.size(); i++) {
+            Student student = allStudents.get(i);
             EligibilityService.EvaluationResult eval = eligibilityService.evaluate(student, company);
 
             if (eval.isEligible()) {
+                // If student passed all rules, add to eligible list for ranking
                 RankingService.RankedCandidate rc = new RankingService.RankedCandidate(student, eval.getSkillMatchPercentage());
                 eligibleRankContainers.add(rc);
             } else {
+                // If student failed any rule, save as ineligible with exact rejection reasons
                 ShortlistCandidate inelig = new ShortlistCandidate();
                 inelig.setStudentId(student.getStudentId());
                 inelig.setStudentName(student.getFullName());
@@ -111,13 +128,15 @@ public class ShortlistService {
             }
         }
 
-        // Step 2: Rank eligible candidates
+        // Step 5: Rank eligible candidates (Highest score first, CGPA tie-breaker)
         List<RankingService.RankedCandidate> ranked = rankingService.rankCandidates(
                 eligibleRankContainers, wCgpa, wSkills, wCerts);
 
-        // Step 3: Add ranked candidates
-        for (RankingService.RankedCandidate rc : ranked) {
+        // Step 6: Add ranked candidates into the shortlist
+        for (int i = 0; i < ranked.size(); i++) {
+            RankingService.RankedCandidate rc = ranked.get(i);
             Student s = rc.getStudent();
+
             ShortlistCandidate candidate = new ShortlistCandidate();
             candidate.setStudentId(s.getStudentId());
             candidate.setStudentName(s.getFullName());
@@ -137,14 +156,15 @@ public class ShortlistService {
             shortlist.addCandidate(candidate);
         }
 
-        // Add ineligible candidates
-        for (ShortlistCandidate inelig : ineligibleCandidates) {
-            shortlist.addCandidate(inelig);
+        // Step 7: Add ineligible candidates into the shortlist
+        for (int i = 0; i < ineligibleCandidates.size(); i++) {
+            shortlist.addCandidate(ineligibleCandidates.get(i));
         }
 
         shortlist.setEligibleCount(ranked.size());
         shortlist.setIneligibleCount(ineligibleCandidates.size());
 
+        // Step 8: Save to database and return
         return shortlistRepository.save(shortlist);
     }
 
@@ -153,12 +173,15 @@ public class ShortlistService {
     }
 
     public Shortlist getShortlistById(Long id) {
-        return shortlistRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Shortlist not found with ID: " + id));
+        Optional<Shortlist> shortlistOpt = shortlistRepository.findById(id);
+        if (!shortlistOpt.isPresent()) {
+            throw new NoSuchElementException("Shortlist not found with ID: " + id);
+        }
+        return shortlistOpt.get();
     }
 
     /**
-     * Exports shortlist to CSV format using Apache Commons CSV.
+     * Exports shortlist to CSV format.
      */
     public void exportToCsv(Long shortlistId, Writer writer) {
         Shortlist shortlist = getShortlistById(shortlistId);
@@ -171,7 +194,9 @@ public class ShortlistService {
                     .build();
 
             try (CSVPrinter printer = new CSVPrinter(writer, csvFormat)) {
-                for (ShortlistCandidate c : shortlist.getCandidates()) {
+                List<ShortlistCandidate> candidates = shortlist.getCandidates();
+                for (int i = 0; i < candidates.size(); i++) {
+                    ShortlistCandidate c = candidates.get(i);
                     printer.printRecord(
                             c.getRankNumber() != null ? c.getRankNumber() : "-",
                             c.getStudentId(),
@@ -182,8 +207,8 @@ public class ShortlistService {
                             c.getSkillsSummary(),
                             c.getMatchedSkillsSummary(),
                             String.format("%.1f%%", c.getSkillMatchPercentage()),
-                            c.getEligible() ? c.getRankingScore() : "-",
-                            c.getEligible() ? "ELIGIBLE" : "NOT ELIGIBLE",
+                            Boolean.TRUE.equals(c.getEligible()) ? c.getRankingScore() : "-",
+                            Boolean.TRUE.equals(c.getEligible()) ? "ELIGIBLE" : "NOT ELIGIBLE",
                             c.getRejectionReasons() != null ? c.getRejectionReasons() : ""
                     );
                 }
@@ -195,7 +220,7 @@ public class ShortlistService {
     }
 
     /**
-     * Exports shortlist to pretty JSON.
+     * Exports shortlist to readable JSON format.
      */
     public String exportToJson(Long shortlistId) {
         Shortlist shortlist = getShortlistById(shortlistId);
