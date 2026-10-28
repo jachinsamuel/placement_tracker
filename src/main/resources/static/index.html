@@ -325,7 +325,7 @@
                 <!-- Company Selection and Criteria Card -->
                 <div class="app-card mb-4">
                     <div class="app-card-header">
-                        <h5><i class="bi bi-funnel-fill text-primary me-2"></i>Select Company & Configure Ranking Weights</h5>
+                        <h5><i class="bi bi-funnel-fill text-primary me-2"></i>Select Company to Shortlist Candidates</h5>
                     </div>
                     <div class="app-card-body">
                         <div class="row g-4 align-items-center">
@@ -347,31 +347,9 @@
                             </div>
                         </div>
 
-                        <!-- Configurable Ranking Weights -->
-                        <div class="border-top pt-3 mt-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="fw-bold small text-uppercase text-muted"><i class="bi bi-sliders me-1"></i>Candidate Ranking Weights</span>
-                                <span class="badge" id="weightTotalBadge" style="background-color: #2563eb;">Total: 100%</span>
-                            </div>
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-semibold">CGPA Weight (%)</label>
-                                    <input type="number" id="weightCgpa" class="form-control" value="60" min="0" max="100" step="5" oninput="validateWeights()">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-semibold">Technical Skills Weight (%)</label>
-                                    <input type="number" id="weightSkills" class="form-control" value="30" min="0" max="100" step="5" oninput="validateWeights()">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-semibold">Certifications/Achievements (%)</label>
-                                    <input type="number" id="weightCerts" class="form-control" value="10" min="0" max="100" step="5" oninput="validateWeights()">
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="text-end mt-4">
                             <button id="btnRunShortlist" class="btn btn-primary px-4 py-2 fw-semibold" onclick="generateShortlist()" disabled>
-                                <i class="bi bi-lightning-charge-fill me-1"></i> Run Shortlisting & Ranking Engine
+                                <i class="bi bi-lightning-charge-fill me-1"></i> Shortlist Candidates
                             </button>
                         </div>
                     </div>

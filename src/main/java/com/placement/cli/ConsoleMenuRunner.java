@@ -305,27 +305,9 @@ public class ConsoleMenuRunner implements CommandLineRunner {
         int companyChoice = readInt(scanner, "Choose company number [1-" + companies.size() + "]: ", 1, companies.size());
         Company selectedCompany = companies.get(companyChoice - 1);
 
-        System.out.println("\nConfigure Ranking Weights (Must total 100%):");
-        System.out.println("Default weights: 60% CGPA, 30% Skills, 10% Certifications");
-        System.out.print("Press [Enter] to use default weights, or 'C' to customize: ");
-        String customChoice = scanner.nextLine().trim();
-
         double cgpaW = 60.0;
         double skillsW = 30.0;
         double certsW = 10.0;
-
-        if ("C".equalsIgnoreCase(customChoice) || "custom".equalsIgnoreCase(customChoice)) {
-            while (true) {
-                cgpaW = readDouble(scanner, "CGPA Weight (%): ", 0.0, 100.0);
-                skillsW = readDouble(scanner, "Technical Skills Weight (%): ", 0.0, 100.0);
-                certsW = readDouble(scanner, "Certifications/Achievements Weight (%): ", 0.0, 100.0);
-
-                if (Math.abs((cgpaW + skillsW + certsW) - 100.0) < 0.001) {
-                    break;
-                }
-                System.out.println("[X] Weights must sum to exactly 100%! Current sum: " + (cgpaW + skillsW + certsW) + "%. Please try again.");
-            }
-        }
 
         System.out.println("\n[*] Evaluating all registered students against " + selectedCompany.getName() + " criteria...");
 

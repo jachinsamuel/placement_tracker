@@ -687,45 +687,20 @@ function onShortlistCompanySelected() {
     `;
 }
 
-function validateWeights() {
-    const wCgpa = parseFloat(document.getElementById('weightCgpa').value) || 0;
-    const wSkills = parseFloat(document.getElementById('weightSkills').value) || 0;
-    const wCerts = parseFloat(document.getElementById('weightCerts').value) || 0;
-
-    const total = wCgpa + wSkills + wCerts;
-    const badge = document.getElementById('weightTotalBadge');
-
-    badge.textContent = `Total: ${total.toFixed(0)}%`;
-    if (Math.abs(total - 100) < 0.001) {
-        badge.style.backgroundColor = 'var(--apple-green)';
-        badge.style.color = '#ffffff';
-        return true;
-    } else {
-        badge.style.backgroundColor = 'var(--apple-red)';
-        badge.style.color = '#ffffff';
-        return false;
-    }
-}
-
 async function generateShortlist() {
     const select = document.getElementById('shortlistCompanySelect');
     const companyId = select.value;
     if (!companyId) return;
 
-    if (!validateWeights()) {
-        showToast('Ranking weights must add up to exactly 100%', 'danger');
-        return;
-    }
-
     const payload = {
-        cgpaWeight: parseFloat(document.getElementById('weightCgpa').value),
-        skillsWeight: parseFloat(document.getElementById('weightSkills').value),
-        certsWeight: parseFloat(document.getElementById('weightCerts').value)
+        cgpaWeight: 60.0,
+        skillsWeight: 30.0,
+        certsWeight: 10.0
     };
 
     const btn = document.getElementById('btnRunShortlist');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Evaluating & Ranking Candidates...';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Shortlisting Candidates...';
 
     try {
         const response = await fetch(`/api/shortlists/generate/${companyId}`, {
@@ -737,7 +712,7 @@ async function generateShortlist() {
         if (response.ok) {
             state.currentShortlist = await response.json();
             renderShortlistResults(state.currentShortlist);
-            showToast('Shortlisting evaluation and ranking complete!', 'success');
+            showToast('Shortlist generated successfully!', 'success');
         } else {
             const err = await response.json();
             showToast(err.message || 'Error generating shortlist', 'danger');
