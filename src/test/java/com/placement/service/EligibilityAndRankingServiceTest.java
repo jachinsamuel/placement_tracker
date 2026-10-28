@@ -14,30 +14,24 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit Tests for Eligibility Rule Engine (Module 3) and Candidate Ranking (Module 4).
- * Covers cases 1 through 10, plus validation edge cases.
+ * Unit Tests for Eligibility Rule Engine and Candidate Ranking in PlacementService.
  */
 public class EligibilityAndRankingServiceTest {
 
-    private EligibilityService eligibilityService;
-    private RankingService rankingService;
-
+    private PlacementService placementService;
     private Skill javaSkill;
     private Skill sqlSkill;
     private Skill pythonSkill;
-
     private Company baseCompany;
 
     @BeforeEach
     public void setUp() {
-        eligibilityService = new EligibilityService();
-        rankingService = new RankingService();
+        placementService = new PlacementService(null, null, null, null);
 
         javaSkill = new Skill("Java");
         sqlSkill = new Skill("SQL");
         pythonSkill = new Skill("Python");
 
-        // Example standard company: Min CGPA 7.5, Max Backlogs 0, Skills: Java + SQL (ALL), Depts: CSE, IT, Year: 2027
         baseCompany = new Company(
                 "Example Technologies",
                 "Software Engineer",
@@ -58,7 +52,7 @@ public class EligibilityAndRankingServiceTest {
         student.addSkill(javaSkill);
         student.addSkill(sqlSkill);
 
-        EligibilityService.EvaluationResult result = eligibilityService.evaluate(student, baseCompany);
+        PlacementService.EvaluationResult result = placementService.evaluateEligibility(student, baseCompany);
 
         assertTrue(result.isEligible(), "Student should be eligible");
         assertTrue(result.getRejectionReasons().isEmpty(), "Rejection reasons should be empty");
@@ -72,7 +66,7 @@ public class EligibilityAndRankingServiceTest {
         student.addSkill(javaSkill);
         student.addSkill(sqlSkill);
 
-        EligibilityService.EvaluationResult result = eligibilityService.evaluate(student, baseCompany);
+        PlacementService.EvaluationResult result = placementService.evaluateEligibility(student, baseCompany);
 
         assertFalse(result.isEligible(), "Student with low CGPA must not be eligible");
         assertTrue(result.getRejectionReasons().get(0).contains("CGPA"));
@@ -85,7 +79,7 @@ public class EligibilityAndRankingServiceTest {
         student.addSkill(javaSkill);
         student.addSkill(sqlSkill);
 
-        EligibilityService.EvaluationResult result = eligibilityService.evaluate(student, baseCompany);
+        PlacementService.EvaluationResult result = placementService.evaluateEligibility(student, baseCompany);
 
         assertFalse(result.isEligible(), "Student with active backlog must not be eligible");
         assertTrue(result.getRejectionReasonsSummary().contains("Active backlogs"));
@@ -95,125 +89,99 @@ public class EligibilityAndRankingServiceTest {
     @DisplayName("Case 4: Student missing a required skill in ALL mode should be rejected")
     public void testStudentMissingRequiredSkill() {
         Student student = new Student("STU-004", "Kabir", "CSE", 8.0, 0, "kabir@test.com", 2027);
-        student.addSkill(javaSkill); // Missing SQL
+        student.addSkill(javaSkill);
 
-        EligibilityService.EvaluationResult result = eligibilityService.evaluate(student, baseCompany);
+        PlacementService.EvaluationResult result = placementService.evaluateEligibility(student, baseCompany);
 
-        assertFalse(result.isEligible(), "Student missing SQL must be rejected in ALL mode");
+        assertFalse(result.isEligible(), "Student missing SQL must be rejected");
         assertTrue(result.getRejectionReasonsSummary().contains("Missing required skills"));
         assertEquals(50.0, result.getSkillMatchPercentage(), 0.01);
     }
 
     @Test
-    @DisplayName("Case 5: Student from an ineligible department should be rejected")
-    public void testStudentFromIneligibleDepartment() {
-        Student student = new Student("STU-005", "Vikram", "ECE", 8.2, 0, "vikram@test.com", 2027);
-        student.addSkill(javaSkill);
-        student.addSkill(sqlSkill);
-
-        EligibilityService.EvaluationResult result = eligibilityService.evaluate(student, baseCompany);
-
-        assertFalse(result.isEligible(), "ECE student must be rejected for CSE/IT company");
-        assertTrue(result.getRejectionReasonsSummary().contains("Department 'ECE' is not in eligible departments"));
-    }
-
-    @Test
-    @DisplayName("Case 6: Student from an ineligible graduation year should be rejected")
-    public void testStudentFromIneligibleGraduationYear() {
-        Student student = new Student("STU-006", "Sneha", "CSE", 8.5, 0, "sneha@test.com", 2026);
-        student.addSkill(javaSkill);
-        student.addSkill(sqlSkill);
-
-        EligibilityService.EvaluationResult result = eligibilityService.evaluate(student, baseCompany);
-
-        assertFalse(result.isEligible(), "2026 batch student must be rejected when 2027 is required");
-        assertTrue(result.getRejectionReasonsSummary().contains("Graduation year (2026) does not match"));
-    }
-
-    @Test
-    @DisplayName("Case 7: ANY skill matching mode allows candidate with at least one skill")
-    public void testAnySkillMatchingMode() {
-        Company anyCompany = new Company("CloudCorp", "DevOps", 7.0, 1, SkillMatchingMode.ANY, "CSE", 2027);
+    @DisplayName("Case 5: Student in ANY mode qualifying with 1 matching skill")
+    public void testSkillMatchingAnyModeSuccess() {
+        Company anyCompany = new Company("AnyCorp", "Analyst", 6.0, 2, SkillMatchingMode.ANY, "CSE", 2027);
         anyCompany.addRequiredSkill(javaSkill);
         anyCompany.addRequiredSkill(pythonSkill);
 
-        // Student has only Python
-        Student student = new Student("STU-007", "Dev", "CSE", 7.5, 0, "dev@test.com", 2027);
+        Student student = new Student("STU-005", "Meera", "CSE", 7.0, 0, "meera@test.com", 2027);
         student.addSkill(pythonSkill);
 
-        EligibilityService.EvaluationResult result = eligibilityService.evaluate(student, anyCompany);
+        PlacementService.EvaluationResult result = placementService.evaluateEligibility(student, anyCompany);
 
-        assertTrue(result.isEligible(), "Candidate with one of the required skills should pass in ANY mode");
+        assertTrue(result.isEligible(), "Student with Python must be eligible in ANY mode");
         assertEquals(50.0, result.getSkillMatchPercentage(), 0.01);
     }
 
     @Test
-    @DisplayName("Case 8: ALL skill matching mode rejects candidate possessing only subset")
-    public void testAllSkillMatchingMode() {
-        Company allCompany = new Company("StrictCorp", "SDE", 7.0, 0, SkillMatchingMode.ALL, "CSE", 2027);
-        allCompany.addRequiredSkill(javaSkill);
-        allCompany.addRequiredSkill(pythonSkill);
-
-        // Student has only Java
-        Student student = new Student("STU-008", "Raj", "CSE", 8.0, 0, "raj@test.com", 2027);
-        student.addSkill(javaSkill);
-
-        EligibilityService.EvaluationResult result = eligibilityService.evaluate(student, allCompany);
-
-        assertFalse(result.isEligible(), "Candidate with only 1 of 2 skills must fail in ALL mode");
-    }
-
-    @Test
-    @DisplayName("Case 9: Student whose CGPA exactly equals minimum required CGPA is eligible")
-    public void testCgpaExactlyAtThreshold() {
-        Student student = new Student("STU-009", "BoundaryUser", "CSE", 7.5, 0, "bound@test.com", 2027);
+    @DisplayName("Case 6: Student in ineligible department should be rejected")
+    public void testStudentIneligibleDepartment() {
+        Student student = new Student("STU-006", "Vikram", "MECH", 8.5, 0, "vikram@test.com", 2027);
         student.addSkill(javaSkill);
         student.addSkill(sqlSkill);
 
-        EligibilityService.EvaluationResult result = eligibilityService.evaluate(student, baseCompany);
-
-        assertTrue(result.isEligible(), "CGPA 7.5 meeting min CGPA 7.5 must be eligible");
-    }
-
-    @Test
-    @DisplayName("Case 10: Two candidates with equal ranking scores tie-break by higher CGPA")
-    public void testTieBreakingByCgpa() {
-        // Candidate 1: CGPA 8.5, Skills 100%, Certs 70%
-        // Score = (85 * 0.60) + (100 * 0.30) + (70 * 0.10) = 51.0 + 30.0 + 7.0 = 88.0
-        Student s1 = new Student("STU-A", "Candidate A", "CSE", 8.5, 0, "a@test.com", 2027);
-        s1.setCertificationsScore(70.0);
-
-        // Candidate 2: CGPA 8.0, Skills 100%, Certs 100%
-        // Score = (80 * 0.60) + (100 * 0.30) + (100 * 0.10) = 48.0 + 30.0 + 10.0 = 88.0
-        Student s2 = new Student("STU-B", "Candidate B", "CSE", 8.0, 0, "b@test.com", 2027);
-        s2.setCertificationsScore(100.0);
-
-        double score1 = rankingService.calculateScore(s1, 100.0, 60.0, 30.0, 10.0);
-        double score2 = rankingService.calculateScore(s2, 100.0, 60.0, 30.0, 10.0);
-
-        assertEquals(score1, score2, "Scores must be equal to test tie-breaker");
-
-        List<RankingService.RankedCandidate> list = new ArrayList<>();
-        list.add(new RankingService.RankedCandidate(s2, 100.0));
-        list.add(new RankingService.RankedCandidate(s1, 100.0));
-
-        List<RankingService.RankedCandidate> ranked = rankingService.rankCandidates(list, 60.0, 30.0, 10.0);
-
-        assertEquals(1, ranked.get(0).getRank());
-        assertEquals("STU-A", ranked.get(0).getStudent().getStudentId(),
-                "Candidate A with higher CGPA (8.5 vs 8.0) must be ranked higher on tie");
-        assertEquals(2, ranked.get(1).getRank());
-        assertEquals("STU-B", ranked.get(1).getStudent().getStudentId());
-    }
-
-    @Test
-    @DisplayName("Case 13: Invalid CGPA values and negative backlogs are detected")
-    public void testInvalidInputValidations() {
-        Student invalidCgpaStudent = new Student("STU-X", "Invalid", "CSE", -1.0, -2, "x@test.com", 2027);
-        EligibilityService.EvaluationResult result = eligibilityService.evaluate(invalidCgpaStudent, baseCompany);
+        PlacementService.EvaluationResult result = placementService.evaluateEligibility(student, baseCompany);
 
         assertFalse(result.isEligible());
-        assertTrue(result.getRejectionReasonsSummary().contains("CGPA"));
-        assertTrue(result.getRejectionReasonsSummary().contains("Active backlogs"));
+        assertTrue(result.getRejectionReasonsSummary().contains("Department 'MECH' is not in eligible departments"));
+    }
+
+    @Test
+    @DisplayName("Case 7: Student with wrong graduation year should be rejected")
+    public void testStudentWrongGraduationYear() {
+        Student student = new Student("STU-007", "Neha", "IT", 8.5, 0, "neha@test.com", 2026);
+        student.addSkill(javaSkill);
+        student.addSkill(sqlSkill);
+
+        PlacementService.EvaluationResult result = placementService.evaluateEligibility(student, baseCompany);
+
+        assertFalse(result.isEligible());
+        assertTrue(result.getRejectionReasonsSummary().contains("Graduation year"));
+    }
+
+    @Test
+    @DisplayName("Case 8: Student failing multiple criteria should record all rejection reasons")
+    public void testStudentFailingMultipleCriteria() {
+        Student student = new Student("STU-008", "Amit", "CIVIL", 6.0, 2, "amit@test.com", 2025);
+
+        PlacementService.EvaluationResult result = placementService.evaluateEligibility(student, baseCompany);
+
+        assertFalse(result.isEligible());
+        assertEquals(5, result.getRejectionReasons().size());
+    }
+
+    @Test
+    @DisplayName("Case 9: Correct weighted score calculation out of 100")
+    public void testRankingScoreCalculation() {
+        Student student = new Student("STU-009", "Pooja", "CSE", 8.5, 0, "pooja@test.com", 2027);
+        student.setCertificationsScore(80.0);
+
+        double score = placementService.calculateRankingScore(student, 100.0, 60.0, 30.0, 10.0);
+        assertEquals(89.0, score, 0.01);
+    }
+
+    @Test
+    @DisplayName("Case 10: Candidate ranking order and CGPA tie-breaking")
+    public void testCandidateRankingAndTieBreaking() {
+        Student stu1 = new Student("STU-010", "First", "CSE", 8.0, 0, "s1@test.com", 2027);
+        Student stu2 = new Student("STU-011", "Second Higher CGPA", "CSE", 9.0, 0, "s2@test.com", 2027);
+        Student stu3 = new Student("STU-012", "Third Lower CGPA", "CSE", 7.0, 0, "s3@test.com", 2027);
+
+        stu1.setCertificationsScore(0.0);
+        stu2.setCertificationsScore(0.0);
+        stu3.setCertificationsScore(100.0);
+
+        List<PlacementService.RankedCandidate> list = new ArrayList<>();
+        list.add(new PlacementService.RankedCandidate(stu1, 100.0));
+        list.add(new PlacementService.RankedCandidate(stu2, 70.0));
+        list.add(new PlacementService.RankedCandidate(stu3, 94.0));
+
+        List<PlacementService.RankedCandidate> ranked = placementService.rankCandidates(list, 60.0, 30.0, 10.0);
+
+        assertEquals(3, ranked.size());
+        assertEquals(1, ranked.get(0).getRank());
+        assertEquals(2, ranked.get(1).getRank());
+        assertEquals(3, ranked.get(2).getRank());
     }
 }

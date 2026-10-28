@@ -1,7 +1,7 @@
 package com.placement.cli;
 
 import com.placement.model.*;
-import com.placement.service.*;
+import com.placement.service.PlacementService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -16,22 +16,13 @@ import java.util.*;
 @Component
 public class ConsoleMenuRunner implements CommandLineRunner {
 
-    private final StudentService studentService;
-    private final CompanyService companyService;
-    private final ShortlistService shortlistService;
-    private final DashboardService dashboardService;
+    private final PlacementService placementService;
 
     @Value("${placement.cli.enabled:true}")
     private boolean cliEnabled;
 
-    public ConsoleMenuRunner(StudentService studentService,
-                             CompanyService companyService,
-                             ShortlistService shortlistService,
-                             DashboardService dashboardService) {
-        this.studentService = studentService;
-        this.companyService = companyService;
-        this.shortlistService = shortlistService;
-        this.dashboardService = dashboardService;
+    public ConsoleMenuRunner(PlacementService placementService) {
+        this.placementService = placementService;
     }
 
     @Override
@@ -40,14 +31,12 @@ public class ConsoleMenuRunner implements CommandLineRunner {
             return;
         }
 
-        // Run interactive CLI in a separate daemon thread so Spring Boot web server starts immediately
         Thread consoleThread = new Thread(this::startInteractiveLoop, "Interactive-Console-Thread");
         consoleThread.setDaemon(true);
         consoleThread.start();
     }
 
     private void startInteractiveLoop() {
-        // Brief pause to allow Spring Boot startup logs to settle
         try {
             Thread.sleep(1200);
         } catch (InterruptedException ignored) {}
@@ -66,7 +55,6 @@ public class ConsoleMenuRunner implements CommandLineRunner {
             System.out.print("Enter choice [1-8]: ");
 
             if (!scanner.hasNextLine()) {
-                // Non-interactive / EOF detected (e.g., background daemon or pipe)
                 break;
             }
 
@@ -155,7 +143,7 @@ public class ConsoleMenuRunner implements CommandLineRunner {
             student.setSkillNames(skills);
             student.setCertificationsScore(certs);
 
-            Student saved = studentService.createStudent(student);
+            Student saved = placementService.createStudent(student);
             System.out.println("\n[+] SUCCESS: Student '" + saved.getFullName() + "' (" + saved.getStudentId() + ") registered successfully!");
         } catch (Exception ex) {
             System.out.println("\n[X] ERROR: " + ex.getMessage());
@@ -167,7 +155,7 @@ public class ConsoleMenuRunner implements CommandLineRunner {
     // =========================================================================
     private void handleViewAllStudents() {
         System.out.println("\n--- [REGISTERED STUDENTS DIRECTORY] ---");
-        List<Student> students = studentService.getAllStudents();
+        List<Student> students = placementService.getAllStudents();
 
         if (students.isEmpty()) {
             System.out.println("No students registered yet. Use Option [1] to add a student or import via Web UI.");
@@ -249,7 +237,7 @@ public class ConsoleMenuRunner implements CommandLineRunner {
             company.setEligibleGraduationYear(gradYear);
             company.setActive(true);
 
-            Company saved = companyService.createCompany(company);
+            Company saved = placementService.createCompany(company);
             System.out.println("\n[+] SUCCESS: Company '" + saved.getName() + "' for role '" + saved.getJobRole() + "' registered successfully!");
         } catch (Exception ex) {
             System.out.println("\n[X] ERROR: " + ex.getMessage());
@@ -261,7 +249,7 @@ public class ConsoleMenuRunner implements CommandLineRunner {
     // =========================================================================
     private void handleViewAllCompanies() {
         System.out.println("\n--- [VISITING COMPANIES DIRECTORY] ---");
-        List<Company> companies = companyService.getAllCompanies();
+        List<Company> companies = placementService.getAllCompanies();
 
         if (companies.isEmpty()) {
             System.out.println("No companies registered yet. Use Option [3] to register a company.");
@@ -300,7 +288,7 @@ public class ConsoleMenuRunner implements CommandLineRunner {
     // =========================================================================
     private void handleGenerateShortlist(Scanner scanner) {
         System.out.println("\n--- [RUN SHORTLISTING & RANKING ENGINE] ---");
-        List<Company> companies = companyService.getAllCompanies();
+        List<Company> companies = placementService.getAllCompanies();
 
         if (companies.isEmpty()) {
             System.out.println("[X] No companies available. Please register a company first using Option [3].");
@@ -342,7 +330,7 @@ public class ConsoleMenuRunner implements CommandLineRunner {
         System.out.println("\n[*] Evaluating all registered students against " + selectedCompany.getName() + " criteria...");
 
         try {
-            Shortlist shortlist = shortlistService.generateShortlist(selectedCompany.getId(), cgpaW, skillsW, certsW);
+            Shortlist shortlist = placementService.generateShortlist(selectedCompany.getId(), cgpaW, skillsW, certsW);
 
             System.out.println("\n==============================================================");
             System.out.println("                   SHORTLIST RESULTS SUMMARY                  ");
@@ -424,7 +412,7 @@ public class ConsoleMenuRunner implements CommandLineRunner {
     // =========================================================================
     private void handleViewShortlistHistory() {
         System.out.println("\n--- [HISTORICAL SHORTLIST SESSIONS] ---");
-        List<Shortlist> history = shortlistService.getAllShortlists();
+        List<Shortlist> history = placementService.getAllShortlists();
 
         if (history.isEmpty()) {
             System.out.println("No shortlists generated yet. Use Option [5] to run shortlisting.");
@@ -456,7 +444,7 @@ public class ConsoleMenuRunner implements CommandLineRunner {
         System.out.println("\n==============================================================");
         System.out.println("                PLACEMENT HUB ANALYTICS SUMMARY               ");
         System.out.println("==============================================================");
-        Map<String, Object> stats = dashboardService.getOverallStats();
+        Map<String, Object> stats = placementService.getOverallStats();
 
         System.out.println("Total Registered Students:     " + stats.get("totalStudents"));
         System.out.println("Total Visiting Companies:       " + stats.get("totalCompanies"));

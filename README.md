@@ -68,18 +68,18 @@ The project adheres to a clean, beginner-friendly **Model-View-Controller (MVC)*
 
 ```mermaid
 flowchart TD
-    Client["Browser (HTML5, Bootstrap 5, JavaScript Fetch API)"]
+    Client["Browser UI (app.js) & Terminal CLI (ConsoleMenuRunner.java)"]
     
     subgraph SpringBootApp ["Spring Boot Application (Port 8080)"]
-        Controller["REST Controllers\n(Student, Company, Shortlist, Dashboard)"]
-        Service["Service Layer (Business Logic)\n• EligibilityService\n• RankingService\n• StudentService\n• CompanyService\n• ShortlistService\n• DashboardService"]
-        Repository["Spring Data JPA Repositories"]
-        Model["Domain Entities\n(Student, Company, Skill, Shortlist, ShortlistCandidate)"]
+        Controller["PlacementController.java\n(Single REST Controller for All Web Requests)"]
+        Service["PlacementService.java\n(Single Unified Service for All Business Logic & Rules)"]
+        Repository["Repositories (StudentRepository, CompanyRepository, ShortlistRepository, SkillRepository)"]
+        Model["Domain Entities (Student, Company, Skill, Shortlist, ShortlistCandidate)"]
     end
     
-    subgraph DataTier ["Data Storage"]
-        H2["In-Memory H2 DB\n(Dev / Demo Profile)"]
-        MySQL["MySQL Database\n(Production Profile)"]
+    subgraph DataTier ["Database"]
+        H2["In-Memory H2 DB (Zero Setup Dev Profile)"]
+        MySQL["MySQL Database (Production Profile)"]
     end
 
     Client <-->|REST JSON / HTTP| Controller
@@ -96,29 +96,25 @@ flowchart TD
 sequenceDiagram
     autonumber
     actor Coordinator as Placement Officer
-    participant UI as Frontend (app.js)
-    participant SC as ShortlistController
-    participant SS as ShortlistService
-    participant ES as EligibilityService
-    participant RS as RankingService
+    participant UI as Frontend (app.js) / Terminal (ConsoleMenuRunner)
+    participant PC as PlacementController
+    participant PS as PlacementService
     participant DB as MySQL / H2 Database
 
     Coordinator->>UI: Selects Company & Clicks "Generate Shortlist"
-    UI->>SC: POST /api/shortlists/generate/{companyId} (Weights: 60/30/10)
-    SC->>SS: generateShortlist(companyId, 60, 30, 10)
-    SS->>DB: Fetch Company criteria & All registered Students
-    DB-->>SS: Returns Company & Student entities
+    UI->>PC: POST /api/shortlists/generate/{companyId} (Weights: 60/30/10)
+    PC->>PS: generateShortlist(companyId, 60, 30, 10)
+    PS->>DB: Fetch Company criteria & All registered Students
+    DB-->>PS: Returns Company & Student entities
     loop For each student
-        SS->>ES: evaluateEligibility(student, company)
-        ES-->>SS: Return EligibilityResult (isEligible, rejectionReasons, matchedSkills)
+        PS->>PS: evaluateEligibility(student, company)
     end
-    SS->>RS: rankEligibleCandidates(eligibleCandidates, company, weights)
-    Note over RS: Calculate scores, apply tie-breaking & assign ranks #1, #2...
-    RS-->>SS: Ranked Candidates List
-    SS->>DB: Save Shortlist session & Candidates snapshot
-    DB-->>SS: Saved Shortlist
-    SS-->>SC: Return Shortlist Object
-    SC-->>UI: 200 OK (JSON)
+    PS->>PS: rankCandidates(eligibleCandidates, weights)
+    Note over PS: Calculate scores, apply tie-breaking & assign ranks #1, #2...
+    PS->>DB: Save Shortlist session & Candidates snapshot
+    DB-->>PS: Saved Shortlist
+    PS-->>PC: Return Shortlist Object
+    PC-->>UI: 200 OK (JSON)
     UI-->>Coordinator: Render Gold/Silver/Bronze Badges, Tables & Export Buttons
 ```
 
