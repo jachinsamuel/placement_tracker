@@ -835,7 +835,7 @@ function renderEligibleTable(candidates) {
     if (candidates.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="9">
+                <td colspan="8">
                     <div class="empty-state py-4">
                         <i class="bi bi-award fs-2"></i>
                         <h6>No Eligible Candidates Match the Criteria</h6>
@@ -862,14 +862,6 @@ function renderEligibleTable(candidates) {
                 <td><strong style="color: var(--apple-blue); font-variant-numeric: tabular-nums;">${c.cgpa.toFixed(2)}</strong></td>
                 <td><span class="badge-eligible">${c.activeBacklogs} Backlogs</span></td>
                 <td><span class="badge-skill">${escapeHtml(c.matchedSkillsSummary || 'None')}</span></td>
-                <td>
-                    <div class="d-flex align-items-center gap-2">
-                        <strong style="color: var(--apple-green-text); font-variant-numeric: tabular-nums; font-size: 0.95rem;">${c.rankingScore.toFixed(2)}</strong>
-                        <div class="progress flex-grow-1" style="height: 6px; width: 64px; background: rgba(0,0,0,0.06); border-radius: 9999px;">
-                            <div class="progress-bar" style="width: ${c.rankingScore}%; background-color: var(--apple-green); border-radius: 9999px;"></div>
-                        </div>
-                    </div>
-                </td>
                 <td><span class="badge-eligible">Eligible</span></td>
             </tr>
         `;
@@ -947,7 +939,7 @@ function renderReportsTable(shortlists) {
     if (shortlists.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="9">
+                <td colspan="8">
                     <div class="empty-state">
                         <i class="bi bi-journal-text"></i>
                         <h5>No Shortlists In Archive</h5>
@@ -967,7 +959,6 @@ function renderReportsTable(shortlists) {
                 <td class="text-muted small">${dateStr}</td>
                 <td class="fw-bold text-primary">${escapeHtml(s.companyName)}</td>
                 <td><span class="badge bg-light text-dark border">${escapeHtml(s.jobRole)}</span></td>
-                <td><span class="badge bg-secondary-subtle text-secondary-emphasis">${s.cgpaWeight}/${s.skillsWeight}/${s.certsWeight}</span></td>
                 <td>${s.totalEvaluated}</td>
                 <td><span class="badge bg-success">${s.eligibleCount}</span></td>
                 <td><span class="badge bg-danger">${s.ineligibleCount}</span></td>
@@ -1015,7 +1006,6 @@ async function viewHistoryDetails(id) {
                 <td>${escapeHtml(c.department)}</td>
                 <td>${c.cgpa.toFixed(2)}</td>
                 <td>${c.activeBacklogs}</td>
-                <td><strong>${c.rankingScore > 0 ? c.rankingScore.toFixed(2) : '-'}</strong></td>
                 <td>${c.eligible
                     ? '<span class="badge bg-success">Eligible</span>'
                     : '<span class="badge bg-danger">Ineligible</span>'}</td>

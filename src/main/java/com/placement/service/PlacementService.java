@@ -604,14 +604,13 @@ public class PlacementService {
         candidates.sort(new Comparator<RankedCandidate>() {
             @Override
             public int compare(RankedCandidate c1, RankedCandidate c2) {
-                if (c2.getRankingScore() > c1.getRankingScore()) return 1;
-                if (c2.getRankingScore() < c1.getRankingScore()) return -1;
-
+                // Rank candidates purely by highest CGPA first
                 double cgpa1 = (c1.getStudent().getCgpa() != null) ? c1.getStudent().getCgpa() : 0.0;
                 double cgpa2 = (c2.getStudent().getCgpa() != null) ? c2.getStudent().getCgpa() : 0.0;
                 if (cgpa2 > cgpa1) return 1;
                 if (cgpa2 < cgpa1) return -1;
 
+                // Tie-breaker: Student ID alphabetical
                 String id1 = (c1.getStudent().getStudentId() != null) ? c1.getStudent().getStudentId() : "";
                 String id2 = (c2.getStudent().getStudentId() != null) ? c2.getStudent().getStudentId() : "";
                 return id1.compareTo(id2);
