@@ -115,7 +115,7 @@ public class ConsoleMenuRunner implements CommandLineRunner {
     private void handleAddStudent(Scanner scanner) {
         System.out.println("\n--- [ADD NEW STUDENT] ---");
 
-        System.out.print("Student ID (e.g. STU101): ");
+        System.out.print("Student ID (e.g. URK25CS1001): ");
         String id = readNonEmpty(scanner, "Student ID cannot be empty");
 
         System.out.print("Full Name: ");
@@ -128,7 +128,7 @@ public class ConsoleMenuRunner implements CommandLineRunner {
         double cgpa = readDouble(scanner, "CGPA (0.0 - 10.0): ", 0.0, 10.0);
         int backlogs = readInt(scanner, "Active Backlogs (0 or more): ", 0, 100);
 
-        System.out.print("Email Address: ");
+        System.out.print("Email Address (e.g. student@karunya.edu.in): ");
         String email = readNonEmpty(scanner, "Email cannot be empty");
 
         int gradYear = readInt(scanner, "Graduation Year (e.g. 2027): ", 2000, 2035);

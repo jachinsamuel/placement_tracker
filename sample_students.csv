@@ -1,6 +1,6 @@
 studentId,fullName,department,cgpa,activeBacklogs,email,graduationYear,skills,certificationsScore
-STU2027011,Nikhil Verma,CSE,8.7,0,nikhil.verma@campus.edu,2027,"Java, SQL, Docker",88.0
-STU2027012,Tanvi Deshmukh,IT,8.2,0,tanvi.deshmukh@campus.edu,2027,"Java, SQL, React",78.0
-STU2027013,Arjun Nair,ECE,7.9,1,arjun.nair@campus.edu,2027,"Python, C++, SQL",65.0
-STU2026014,Swati Sen,CSE,9.0,0,swati.sen@campus.edu,2026,"Java, Spring Boot, AWS",92.0
-STU2026015,Karan Malhotra,MECH,7.4,0,karan.malhotra@campus.edu,2026,"Python, C++",60.0
+URK25CS1001,Nikhil Verma,CSE,8.7,0,nikhil.verma@karunya.edu.in,2027,"Java, SQL, Docker",88.0
+URK25CS1002,Tanvi Deshmukh,IT,8.2,0,tanvi.deshmukh@karunya.edu.in,2027,"Java, SQL, React",78.0
+URK25CS1003,Arjun Nair,ECE,7.9,1,arjun.nair@karunya.edu.in,2027,"Python, C++, SQL",65.0
+URK25CS1004,Swati Sen,CSE,9.0,0,swati.sen@karunya.edu.in,2026,"Java, Spring Boot, AWS",92.0
+URK25CS1005,Karan Malhotra,MECH,7.4,0,karan.malhotra@karunya.edu.in,2026,"Python, C++",60.0
