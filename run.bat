@@ -1,6 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
-title Campus Placement Drive Portal - Interactive Terminal & Web Server
+title Campus Placement Drive Portal - Interactive Terminal and Web Server
 echo ============================================================================
 echo   CAMPUS PLACEMENT SHORTLISTING SYSTEM - LAUNCHER
 echo ============================================================================
