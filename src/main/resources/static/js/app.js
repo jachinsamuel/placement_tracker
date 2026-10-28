@@ -439,6 +439,45 @@ async function uploadStudentCsv(e) {
     }
 }
 
+function openImportCompanyModal() {
+    document.getElementById('importCompanyForm').reset();
+    new bootstrap.Modal(document.getElementById('importCompanyModal')).show();
+}
+
+async function uploadCompanyCsv(e) {
+    e.preventDefault();
+    const fileInput = document.getElementById('companyCsvFileInput');
+    if (!fileInput.files || fileInput.files.length === 0) return;
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    const btn = document.getElementById('btnUploadCompanyCsv');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Importing...';
+
+    try {
+        const res = await fetch('/api/companies/import-csv', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            bootstrap.Modal.getInstance(document.getElementById('importCompanyModal')).hide();
+            showToast(`Successfully imported ${data.importedCount} companies!`, 'success');
+            await loadCompanies();
+        } else {
+            showToast(data.message || 'Failed to import CSV', 'danger');
+        }
+    } catch (err) {
+        showToast('Import error: ' + err.message, 'danger');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-upload me-1"></i> Start Import';
+    }
+}
+
 // ==============================================================================
 // 4. Companies Controller
 // ==============================================================================

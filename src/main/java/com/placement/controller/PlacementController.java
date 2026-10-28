@@ -139,6 +139,22 @@ public class PlacementController {
         return response;
     }
 
+    @PostMapping(value = "/api/companies/import-csv", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, Object>> importCompaniesCsv(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("CSV file is empty");
+        }
+        try {
+            int count = placementService.importCompaniesFromCsv(file.getInputStream());
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Import completed successfully");
+            response.put("importedCount", count);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to import CSV: " + e.getMessage(), e);
+        }
+    }
+
     @PutMapping("/api/companies/{id}/toggle-active")
     public Company toggleCompanyActive(@PathVariable Long id) {
         return placementService.toggleCompanyActive(id);

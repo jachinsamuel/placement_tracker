@@ -1,6 +1,61 @@
 studentId,fullName,department,cgpa,activeBacklogs,email,graduationYear,skills,certificationsScore
-URK25CS1001,Nikhil Verma,CSE,8.7,0,nikhilverma@karunya.edu.in,2027,"Java, SQL, Docker",88.0
-URK25CS1002,Tanvi Deshmukh,IT,8.2,0,tanvideshmukh@karunya.edu.in,2027,"Java, SQL, React",78.0
-URK25CS1003,Arjun Nair,ECE,7.9,1,arjunnair@karunya.edu.in,2027,"Python, C++, SQL",65.0
-URK25CS1004,Swati Sen,CSE,9.0,0,swatisen@karunya.edu.in,2026,"Java, Spring Boot, AWS",92.0
-URK25CS1005,Karan Malhotra,MECH,7.4,0,karanmalhotra@karunya.edu.in,2026,"Python, C++",60.0
+URK25CS1001,Nikhil Verma,CSE,9.45,0,nikhilverma@karunya.edu.in,2027,"Java, SQL, Docker, Spring Boot, AWS",92.0
+URK25CS1002,Tanvi Deshmukh,CSE,8.90,0,tanvideshmukh@karunya.edu.in,2027,"Java, SQL, React, Spring Boot",85.0
+URK25CS1003,Arjun Nair,CSE,8.35,0,arjunnair@karunya.edu.in,2027,"Python, C++, SQL, Git",75.0
+URK25CS1004,Swati Sen,CSE,9.60,0,swatisen@karunya.edu.in,2027,"Java, Spring Boot, AWS, SQL, Docker",96.0
+URK25CS1005,Rohan Sharma,CSE,7.80,0,rohansharma@karunya.edu.in,2027,"Java, SQL, Python",70.0
+URK25CS1006,Priya Kulkarni,CSE,8.75,0,priyakulkarni@karunya.edu.in,2027,"Java, C++, SQL, Machine Learning",82.0
+URK25CS1007,Aditya Menon,CSE,7.20,1,adityamenon@karunya.edu.in,2027,"Python, SQL, HTML/CSS",60.0
+URK25CS1008,Sneha Iyer,CSE,9.15,0,snehaiyer@karunya.edu.in,2027,"Java, Spring Boot, React, SQL",90.0
+URK25CS1009,Rahul Pillai,CSE,6.85,0,rahulpillai@karunya.edu.in,2027,"Java, Python",55.0
+URK25CS1010,Kavya Reddy,CSE,8.40,0,kavyareddy@karunya.edu.in,2027,"Java, SQL, Docker, AWS",80.0
+URK25CS1011,Deepak Joshua,CSE,7.60,0,deepakjoshua@karunya.edu.in,2027,"C++, Python, SQL",68.0
+URK25CS1012,Ananya Ghosh,CSE,9.30,0,ananyaghosh@karunya.edu.in,2027,"Java, Spring Boot, AWS, Docker",94.0
+URK25CS1013,Gautam Krishnan,CSE,6.40,2,gautamkrishnan@karunya.edu.in,2027,"Java, SQL",45.0
+URK25CS1014,Divya Balaji,CSE,8.60,0,divyabalaji@karunya.edu.in,2027,"Java, React, SQL, Spring Boot",84.0
+URK25CS1015,Karthik Samuel,CSE,8.10,0,karthiksamuel@karunya.edu.in,2027,"Python, Machine Learning, SQL",78.0
+URK25CS1016,Meera Nambiar,CSE,7.95,0,meeranambiar@karunya.edu.in,2027,"Java, C++, SQL",72.0
+URK25CS1017,Siddharth Rao,CSE,9.50,0,siddharthrao@karunya.edu.in,2027,"Java, AWS, Docker, Spring Boot, SQL",95.0
+URK25CS1018,Harini Mohan,CSE,8.25,0,harinimohan@karunya.edu.in,2027,"Java, React, SQL",76.0
+URK25CS1019,Vishnu Vardhan,CSE,7.10,1,vishnuvardhan@karunya.edu.in,2027,"Python, C++",58.0
+URK25CS1020,Pavithra Sundar,CSE,8.80,0,pavithrasundar@karunya.edu.in,2027,"Java, Spring Boot, SQL, AWS",86.0
+URK25CS1021,Abhinav Joy,CSE,6.90,0,abhinavjoy@karunya.edu.in,2027,"Python, SQL",52.0
+URK25CS1022,Keerthana Paul,CSE,9.05,0,keerthanapaul@karunya.edu.in,2027,"Java, React, Docker, SQL",88.0
+URK25CS1023,Manoj Kumar,CSE,7.50,0,manojkumar@karunya.edu.in,2027,"Java, SQL, Git",65.0
+URK25CS1024,Rhea Thomas,CSE,8.45,0,rheathomas@karunya.edu.in,2027,"Java, C++, SQL, Spring Boot",80.0
+URK25CS1025,Sanjay Raj,CSE,6.20,1,sanjayraj@karunya.edu.in,2027,"C++, Python",40.0
+URK25IT1001,Abhishek Daniel,IT,8.65,0,abhishekdaniel@karunya.edu.in,2027,"Java, SQL, React, Spring Boot",85.0
+URK25IT1002,Pooja Hegde,IT,9.10,0,poojahegde@karunya.edu.in,2027,"Java, Spring Boot, AWS, SQL",90.0
+URK25IT1003,Naveen Joseph,IT,7.70,0,naveenjoseph@karunya.edu.in,2027,"Python, SQL, HTML/CSS",70.0
+URK25IT1004,Shreya Bhatt,IT,8.40,0,shreyabhatt@karunya.edu.in,2027,"Java, React, SQL",80.0
+URK25IT1005,Roshan George,IT,6.75,1,roshangeorge@karunya.edu.in,2027,"Python, Java",50.0
+URK25IT1006,Lavanya Murugan,IT,8.95,0,lavanyamurugan@karunya.edu.in,2027,"Java, AWS, SQL, Spring Boot",88.0
+URK25IT1007,Jerome Isaac,IT,7.30,0,jeromeisaac@karunya.edu.in,2027,"C++, Python, SQL",62.0
+URK25IT1008,Geetha Venkatesh,IT,8.15,0,geethavenkatesh@karunya.edu.in,2027,"Java, SQL, React",78.0
+URK25IT1009,Akash Mathew,IT,9.25,0,akashmathew@karunya.edu.in,2027,"Java, Python, AWS, SQL",92.0
+URK25IT1010,Sujatha David,IT,6.30,2,sujathadavid@karunya.edu.in,2027,"SQL, HTML/CSS",40.0
+URK25EC1001,Kiran Jacob,ECE,8.50,0,kiranjacob@karunya.edu.in,2027,"C++, Python, SQL",82.0
+URK25EC1002,Bhavana Sree,ECE,9.00,0,bhavanasree@karunya.edu.in,2027,"Java, C++, Python, AWS",89.0
+URK25EC1003,Tarun Chacko,ECE,7.40,0,tarunchacko@karunya.edu.in,2027,"C++, Python",66.0
+URK25EC1004,Varsha Simon,ECE,8.20,0,varshasimon@karunya.edu.in,2027,"Python, C++, SQL",78.0
+URK25EC1005,Samson Philip,ECE,6.90,1,samsonphilip@karunya.edu.in,2027,"C++, Java",55.0
+URK25EC1006,Nandini Ramesh,ECE,8.85,0,nandiniramesh@karunya.edu.in,2027,"C++, Python, Embedded Systems",85.0
+URK25EC1007,Ebenezer Raj,ECE,7.15,0,ebenezerraj@karunya.edu.in,2027,"Python, SQL",60.0
+URK25EC1008,Sandra Kurian,ECE,9.35,0,sandrakurian@karunya.edu.in,2027,"Java, C++, SQL, AWS",94.0
+URK25EC1009,Vivek Natarajan,ECE,7.80,0,viveknatarajan@karunya.edu.in,2027,"C++, Python, Machine Learning",72.0
+URK25EC1010,Reena Alex,ECE,6.50,0,reenalex@karunya.edu.in,2027,"Python, C++",50.0
+URK25ME1001,Karan Malhotra,MECH,7.85,0,karanmalhotra@karunya.edu.in,2027,"Python, C++, AutoCAD",72.0
+URK25ME1002,Ajay Varghese,MECH,8.40,0,ajayvarghese@karunya.edu.in,2027,"Python, C++, MATLAB",80.0
+URK25ME1003,Blessy Stephen,MECH,7.10,0,blessystephen@karunya.edu.in,2027,"Python, AutoCAD",62.0
+URK25ME1004,Mathew Cherian,MECH,6.70,1,mathewcherian@karunya.edu.in,2027,"C++, Python",50.0
+URK25ME1005,Praveen Kumar,MECH,8.90,0,praveenkumar@karunya.edu.in,2027,"Python, C++, Java",86.0
+URK25CE1001,Ashwin Zachariah,CIVIL,7.60,0,ashwinzachariah@karunya.edu.in,2027,"AutoCAD, Python, SQL",68.0
+URK25CE1002,Grace Jennifer,CIVIL,8.30,0,gracejennifer@karunya.edu.in,2027,"Python, AutoCAD, STAAD Pro",80.0
+URK25CE1003,Joel Prakash,CIVIL,6.80,1,joelprakash@karunya.edu.in,2027,"AutoCAD, Python",55.0
+URK25CE1004,Merin Abraham,CIVIL,8.75,0,merinabraham@karunya.edu.in,2027,"Python, SQL, GIS",84.0
+URK25CE1005,Stephan George,CIVIL,6.20,0,stephangeorge@karunya.edu.in,2027,"AutoCAD",45.0
+URK25EE1001,Timothy Joshua,EEE,8.45,0,timothyjoshua@karunya.edu.in,2027,"C++, Python, MATLAB",82.0
+URK25EE1002,Angelina Mary,EEE,9.10,0,angelinamary@karunya.edu.in,2027,"Java, Python, C++, SQL",90.0
+URK25EE1003,Caleb John,EEE,7.35,0,calebjohn@karunya.edu.in,2027,"C++, Python, PLC",65.0
+URK25EE1004,Hannah Elizabeth,EEE,8.05,0,hannahelizabeth@karunya.edu.in,2027,"Python, SQL, MATLAB",76.0
+URK25EE1005,Reuben Thomas,EEE,6.60,1,reubenthomas@karunya.edu.in,2027,"C++, Python",50.0

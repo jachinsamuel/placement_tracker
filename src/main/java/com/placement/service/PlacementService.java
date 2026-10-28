@@ -228,6 +228,79 @@ public class PlacementService {
     // SECTION 2: COMPANY MANAGEMENT
     // =========================================================================
 
+    @Transactional
+    public int importCompaniesFromCsv(InputStream inputStream) {
+        int count = 0;
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            CSVFormat format = CSVFormat.Builder.create()
+                    .setHeader()
+                    .setSkipHeaderRecord(true)
+                    .setIgnoreHeaderCase(true)
+                    .setTrim(true)
+                    .build();
+
+            CSVParser parser = format.parse(reader);
+
+            for (CSVRecord record : parser) {
+                String companyCode = getCsvValue(record, "companyCode", "code");
+                String name = getCsvValue(record, "name", "companyName");
+                String jobRole = getCsvValue(record, "jobRole", "role");
+                String minCgpaStr = getCsvValue(record, "minCgpa", "cgpa");
+                String maxBacklogsStr = getCsvValue(record, "maxBacklogs", "backlogs");
+                String skillMatchingModeStr = getCsvValue(record, "skillMatchingMode", "skillMode", "mode");
+                String requiredSkills = getCsvValue(record, "requiredSkills", "skills");
+                String eligibleDepartments = getCsvValue(record, "eligibleDepartments", "departments", "dept");
+                String eligibleGradYearStr = getCsvValue(record, "eligibleGraduationYear", "graduationYear", "batch", "year");
+
+                if (name.isEmpty() || jobRole.isEmpty()) {
+                    continue;
+                }
+
+                if (companyRepository.findByNameIgnoreCase(name).isPresent()) {
+                    continue;
+                }
+
+                double minCgpa = 0.0;
+                try { minCgpa = Double.parseDouble(minCgpaStr); } catch (Exception ignored) {}
+
+                int maxBacklogs = 0;
+                try { maxBacklogs = Integer.parseInt(maxBacklogsStr); } catch (Exception ignored) {}
+
+                SkillMatchingMode mode = SkillMatchingMode.ALL;
+                if ("ANY".equalsIgnoreCase(skillMatchingModeStr)) {
+                    mode = SkillMatchingMode.ANY;
+                }
+
+                Integer gradYear = null;
+                try {
+                    if (!eligibleGradYearStr.isEmpty()) {
+                        gradYear = Integer.parseInt(eligibleGradYearStr);
+                    }
+                } catch (Exception ignored) {}
+
+                Company company = new Company(name, jobRole, minCgpa, maxBacklogs, mode,
+                        eligibleDepartments.isEmpty() ? null : eligibleDepartments, gradYear);
+
+                if (!companyCode.isEmpty()) {
+                    company.setCompanyCode(companyCode);
+                } else {
+                    long randomNum = (System.currentTimeMillis() % 9000) + 1000 + count;
+                    company.setCompanyCode("CMP-" + randomNum);
+                }
+
+                if (!requiredSkills.isEmpty()) {
+                    company.setRequiredSkills(parseSkills(requiredSkills));
+                }
+
+                companyRepository.save(company);
+                count++;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error reading CSV file: " + e.getMessage(), e);
+        }
+        return count;
+    }
+
     public List<Company> getAllCompanies() {
         return companyRepository.findAll();
     }

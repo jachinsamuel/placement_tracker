@@ -1,0 +1,11 @@
+companyCode,name,jobRole,minCgpa,maxBacklogs,skillMatchingMode,requiredSkills,eligibleDepartments,eligibleGraduationYear
+ZOHO-01,Zoho Corporation,Software Development Engineer (SDE),7.0,0,ALL,"Java, C++, SQL","CSE, IT, ECE",2027
+TCS-DIG,TCS Digital,Digital Systems Engineer,7.5,0,ALL,"Java, Python, SQL","CSE, IT, ECE",2027
+INFY-SP,Infosys,Specialist Programmer,8.0,0,ANY,"Java, Python, Spring Boot, React","CSE, IT",2027
+AMZN-SDE,Amazon,Software Development Engineer I,8.5,0,ALL,"Java, AWS, SQL","CSE, IT, ECE",2027
+TCS-NIN,TCS Ninja,Assistant System Engineer,6.0,1,ANY,"Java, Python, C++","CSE, IT, ECE, EEE, MECH, CIVIL",2027
+WIPRO-TRB,Wipro,Project Engineer - Turbo,7.0,0,ANY,"Java, SQL, Python","CSE, IT, ECE, EEE",2027
+LTTS-EMB,L&T Technology Services,Embedded Systems Engineer,6.8,0,ANY,"C++, Python","ECE, EEE, MECH",2027
+BOSCH-AUTO,Bosch Global Software Technologies,Automotive Systems Software Engineer,7.2,0,ANY,"C++, Python, Java","ECE, EEE, MECH, CSE",2027
+CTS-GENC,Cognizant,GenC Next Fullstack Engineer,7.0,0,ANY,"Java, React, SQL","CSE, IT, ECE",2027
+ACCN-AAE,Accenture,Advanced Application Engineering Analyst,6.5,1,ANY,"Java, Python, SQL","CSE, IT, ECE, EEE, MECH, CIVIL",2027
