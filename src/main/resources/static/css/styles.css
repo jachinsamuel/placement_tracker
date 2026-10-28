@@ -695,25 +695,70 @@ body::before {
 
 .criteria-pill {
   background-color: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 0.65rem 1.1rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 0.65rem 1rem;
   border-radius: var(--apple-radius-control);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 64px;
 }
 
-.criteria-pill small {
+.criteria-pill-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.criteria-pill small,
+.criteria-pill-header small {
   display: block;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--apple-label-secondary);
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 0.04em;
+  line-height: 1.2;
+  margin-bottom: 0.25rem;
 }
 
-.criteria-pill span {
+.criteria-pill-header small {
+  margin-bottom: 0;
+}
+
+.criteria-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.criteria-mode-badge.mode-all {
+  background: rgba(0, 113, 227, 0.12);
+  color: #0071e3;
+  border: 1px solid rgba(0, 113, 227, 0.25);
+}
+
+.criteria-mode-badge.mode-any {
+  background: rgba(88, 86, 214, 0.12);
+  color: #5856d6;
+  border: 1px solid rgba(88, 86, 214, 0.25);
+}
+
+.criteria-pill .criteria-val,
+.criteria-pill > span:not(.badge):not(.criteria-mode-badge) {
   font-weight: 600;
   font-size: 0.92rem;
   color: var(--apple-label);
+  line-height: 1.3;
 }
 
 /* ==============================================================================

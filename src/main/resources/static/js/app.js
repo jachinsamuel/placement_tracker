@@ -699,29 +699,32 @@ function onShortlistCompanySelected() {
 
     const skills = (company.requiredSkills || []).map(s => s.name).join(', ') || 'None';
     const modeBadge = company.skillMatchingMode === 'ALL'
-        ? '<span class="badge bg-primary">MATCH ALL</span>'
-        : '<span class="badge bg-info text-dark">MATCH ANY</span>';
+        ? '<span class="criteria-mode-badge mode-all">Match All</span>'
+        : '<span class="criteria-mode-badge mode-any">Match Any</span>';
 
     pillsContainer.innerHTML = `
         <div class="criteria-pill">
             <small>Min CGPA</small>
-            <span>${company.minCgpa}</span>
+            <span class="criteria-val">${company.minCgpa}</span>
         </div>
         <div class="criteria-pill">
             <small>Max Backlogs</small>
-            <span>${company.maxBacklogs}</span>
+            <span class="criteria-val">${company.maxBacklogs}</span>
         </div>
         <div class="criteria-pill">
-            <small>Required Skills (${modeBadge})</small>
-            <span>${escapeHtml(skills)}</span>
+            <div class="criteria-pill-header">
+                <small>Required Skills</small>
+                ${modeBadge}
+            </div>
+            <span class="criteria-val">${escapeHtml(skills)}</span>
         </div>
         <div class="criteria-pill">
             <small>Allowed Depts</small>
-            <span>${escapeHtml(company.eligibleDepartments || 'All Departments')}</span>
+            <span class="criteria-val">${escapeHtml(company.eligibleDepartments || 'All Departments')}</span>
         </div>
         <div class="criteria-pill">
             <small>Eligible Batch</small>
-            <span>${company.eligibleGraduationYear || 'Any Year'}</span>
+            <span class="criteria-val">${company.eligibleGraduationYear || 'Any Year'}</span>
         </div>
     `;
 }
@@ -760,7 +763,7 @@ async function generateShortlist() {
         showToast('Execution error: ' + err.message, 'danger');
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-lightning-charge-fill me-1"></i> Run Shortlisting & Ranking Engine';
+        btn.innerHTML = '<i class="bi bi-lightning-charge-fill me-1"></i> Shortlist Candidates';
     }
 }
 
