@@ -55,7 +55,12 @@ public class ConsoleMenuRunner implements CommandLineRunner {
             System.out.print("Enter choice [1-8]: ");
 
             if (!scanner.hasNextLine()) {
-                break;
+                try {
+                    Thread.sleep(30000);
+                } catch (InterruptedException e) {
+                    break;
+                }
+                continue;
             }
 
             String choice = scanner.nextLine().trim();
