@@ -29,6 +29,12 @@ if %ERRORLEVEL% EQU 0 (
     timeout /t 1 >nul 2>&1
 )
 
+:: Check if rebuild is requested
+if "%1"=="build" (
+    echo [*] Rebuilding application with Maven...
+    call mvn clean package -DskipTests
+)
+
 :: Check if JAR exists, else build it
 if not exist "target\placement-portal-1.0.0.jar" (
     echo [!] JAR file not found. Building project with Maven...
