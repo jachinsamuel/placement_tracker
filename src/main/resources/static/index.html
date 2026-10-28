@@ -61,13 +61,6 @@
                     <span>Shortlist History</span>
                 </a>
             </li>
-            <li class="menu-category">Information</li>
-            <li>
-                <a href="#settings" class="nav-link-item" onclick="navigate('settings')">
-                    <i class="bi bi-info-circle-fill"></i>
-                    <span>Ranking Rules & Info</span>
-                </a>
-            </li>
         </ul>
     </aside>
 
@@ -543,67 +536,6 @@
                                     <tr><td colspan="9" class="text-center py-4 text-muted">No historical shortlists found.</td></tr>
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ============================================================ -->
-            <!-- 6. SETTINGS & DOCUMENTATION VIEW -->
-            <!-- ============================================================ -->
-            <section id="view-settings" class="app-view d-none">
-                <div class="row g-4">
-                    <div class="col-lg-6">
-                        <div class="app-card mb-4">
-                            <div class="app-card-header">
-                                <h5><i class="bi bi-calculator text-primary me-2"></i>Candidate Ranking Algorithm Formula</h5>
-                            </div>
-                            <div class="app-card-body">
-                                <p class="text-muted small">
-                                    The portal uses a 100% rule-based, deterministic scoring algorithm. Each component is normalized out of 100 before applying user-configurable weights:
-                                </p>
-                                <div class="bg-light p-3 rounded-3 border mb-3">
-                                    <code>Score = (Normalized_CGPA × w₁%) + (Skill_Match_% × w₂%) + (Cert_Score × w₃%)</code>
-                                </div>
-                                <ul class="small text-muted ps-3 mb-3">
-                                    <li><strong>Normalized CGPA:</strong> <code>(CGPA / 10.0) × 100.0</code></li>
-                                    <li><strong>Skill Match %:</strong> <code>(Matched_Required_Skills / Total_Required_Skills) × 100.0</code></li>
-                                    <li><strong>Certifications Score:</strong> Maintained score out of 100 (Default: 0.0)</li>
-                                    <li><strong>Tie-Breaking Rule:</strong> If two candidates have identical composite scores, higher CGPA takes precedence.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="app-card mb-4">
-                            <div class="app-card-header">
-                                <h5><i class="bi bi-mortarboard text-primary me-2"></i>College Viva & Project Details</h5>
-                            </div>
-                            <div class="app-card-body">
-                                <table class="table table-sm table-borderless small mb-0">
-                                    <tr>
-                                        <td class="text-muted fw-semibold" style="width: 140px;">Project Title:</td>
-                                        <td>Campus Placement Drive Candidate Tracking & Shortlisting Portal</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-muted fw-semibold">Backend:</td>
-                                        <td>Java 21, Spring Boot 3.2.5, Spring Data JPA</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-muted fw-semibold">Frontend:</td>
-                                        <td>HTML5, CSS3, JavaScript (Fetch REST API), Bootstrap 5, Chart.js</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-muted fw-semibold">Database:</td>
-                                        <td>MySQL (with H2 in-memory development profile fallback)</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-muted fw-semibold">Export Formats:</td>
-                                        <td>RFC 4180 Escaped CSV, Formatted JSON</td>
-                                    </tr>
-                                </table>
-                            </div>
                         </div>
                     </div>
                 </div>

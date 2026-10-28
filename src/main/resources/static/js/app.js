@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initRouter() {
     const hash = window.location.hash.replace('#', '');
-    if (['dashboard', 'students', 'companies', 'shortlist', 'reports', 'settings'].includes(hash)) {
+    if (['dashboard', 'students', 'companies', 'shortlist', 'reports'].includes(hash)) {
         navigate(hash);
     } else {
         navigate('dashboard');
@@ -67,8 +67,7 @@ function navigate(viewName, updateHash = true) {
         students: { title: 'Student Management', sub: 'Academic records, backlogs status, and technical skillsets' },
         companies: { title: 'Company Management', sub: 'Visiting recruitment partners and configured eligibility rules' },
         shortlist: { title: 'Generate Candidate Shortlist', sub: 'Evaluate student pool, rank eligible candidates, and export results' },
-        reports: { title: 'Shortlist Archives & Reports', sub: 'Historical drive results and reproducible audit snapshots' },
-        settings: { title: 'Algorithm & Rules Info', sub: 'Ranking score formula, weight breakdown, and project details' }
+        reports: { title: 'Shortlist Archives & Reports', sub: 'Historical drive results and reproducible audit snapshots' }
     };
 
     if (headings[viewName]) {
