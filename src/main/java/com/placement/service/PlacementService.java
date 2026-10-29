@@ -179,10 +179,6 @@ public class PlacementService {
                     continue;
                 }
 
-                if (studentRepository.existsByStudentId(studentId) || studentRepository.existsByEmail(email)) {
-                    continue;
-                }
-
                 double cgpa = 0.0;
                 try { cgpa = Double.parseDouble(cgpaStr); } catch (Exception ignored) {}
 
@@ -195,7 +191,19 @@ public class PlacementService {
                 double certScore = 0.0;
                 try { certScore = Double.parseDouble(certScoreStr); } catch (Exception ignored) {}
 
-                Student student = new Student(studentId, fullName, department, cgpa, backlogs, email, gradYear);
+                Optional<Student> existingOpt = studentRepository.findByStudentId(studentId);
+                Student student;
+                if (existingOpt.isPresent()) {
+                    student = existingOpt.get();
+                    student.setFullName(fullName);
+                    student.setDepartment(department);
+                    student.setCgpa(cgpa);
+                    student.setActiveBacklogs(backlogs);
+                    student.setEmail(email);
+                    student.setGraduationYear(gradYear);
+                } else {
+                    student = new Student(studentId, fullName, department, cgpa, backlogs, email, gradYear);
+                }
                 student.setCertificationsScore(certScore);
 
                 if (!skillsStr.isEmpty()) {
@@ -256,10 +264,6 @@ public class PlacementService {
                     continue;
                 }
 
-                if (companyRepository.findByNameIgnoreCase(name).isPresent()) {
-                    continue;
-                }
-
                 double minCgpa = 0.0;
                 try { minCgpa = Double.parseDouble(minCgpaStr); } catch (Exception ignored) {}
 
@@ -278,14 +282,25 @@ public class PlacementService {
                     }
                 } catch (Exception ignored) {}
 
-                Company company = new Company(name, jobRole, minCgpa, maxBacklogs, mode,
-                        eligibleDepartments.isEmpty() ? null : eligibleDepartments, gradYear);
-
-                if (!companyCode.isEmpty()) {
-                    company.setCompanyCode(companyCode);
+                Optional<Company> existingComp = companyRepository.findByNameIgnoreCase(name);
+                Company company;
+                if (existingComp.isPresent()) {
+                    company = existingComp.get();
+                    company.setJobRole(jobRole);
+                    company.setMinCgpa(minCgpa);
+                    company.setMaxBacklogs(maxBacklogs);
+                    company.setSkillMatchingMode(mode);
+                    company.setEligibleDepartments(eligibleDepartments.isEmpty() ? null : eligibleDepartments);
+                    company.setEligibleGraduationYear(gradYear);
                 } else {
-                    long randomNum = (System.currentTimeMillis() % 9000) + 1000 + count;
-                    company.setCompanyCode("CMP-" + randomNum);
+                    company = new Company(name, jobRole, minCgpa, maxBacklogs, mode,
+                            eligibleDepartments.isEmpty() ? null : eligibleDepartments, gradYear);
+                    if (!companyCode.isEmpty()) {
+                        company.setCompanyCode(companyCode);
+                    } else {
+                        long randomNum = (System.currentTimeMillis() % 9000) + 1000 + count;
+                        company.setCompanyCode("CMP-" + randomNum);
+                    }
                 }
 
                 if (!requiredSkills.isEmpty()) {

@@ -1,4 +1,6 @@
-# Compiled class file
+# Database files
+data/*.lock.db
+data/*.trace.db
 target/
 *.class
 
