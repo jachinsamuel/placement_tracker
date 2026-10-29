@@ -31,7 +31,12 @@ public class ConsoleMenuRunner implements CommandLineRunner {
             return;
         }
 
-        Thread consoleThread = new Thread(this::startInteractiveLoop, "Interactive-Console-Thread");
+        Thread consoleThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                startInteractiveLoop();
+            }
+        }, "Interactive-Console-Thread");
         consoleThread.setDaemon(true);
         consoleThread.start();
     }
